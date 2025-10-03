@@ -2,17 +2,17 @@ import Fastify from 'fastify';
 import cors from '@fastify/cors';
 import helmet from '@fastify/helmet';
 import rateLimit from '@fastify/rate-limit';
-import { prisma } from '@app/db';
+import { db } from '@app/db';
 import { userRoutes } from './routes/users.js';
 import { postRoutes } from './routes/posts.js';
 
-const PORT = parseInt(process.env.PORT ?? '3000', 10);
-const HOST = process.env.HOST ?? '0.0.0.0';
+const PORT = parseInt(process.env["PORT"] ?? '3000', 10);
+const HOST = process.env["HOST"] ?? '0.0.0.0';
 
 const server = Fastify({
   logger: {
     transport:
-      process.env.NODE_ENV === 'development'
+      process.env["NODE_ENV"] === 'development'
         ? {
             target: 'pino-pretty',
             options: {
@@ -27,7 +27,7 @@ const server = Fastify({
 // Security & Rate Limiting
 await server.register(helmet);
 await server.register(cors, {
-  origin: process.env.CORS_ORIGIN ?? 'http://localhost:5173',
+  origin: process.env["CORS_ORIGIN"] ?? 'http://localhost:5173',
   credentials: true,
 });
 await server.register(rateLimit, {
@@ -38,7 +38,7 @@ await server.register(rateLimit, {
 // Health check
 server.get('/health', async () => {
   try {
-    await prisma.$queryRaw`SELECT 1`;
+    await db.$queryRaw`SELECT 1`;
     return { status: 'ok', timestamp: new Date().toISOString() };
   } catch (error) {
     server.log.error(error);
@@ -54,7 +54,7 @@ await server.register(postRoutes, { prefix: '/api/posts' });
 const shutdown = async (): Promise<void> => {
   server.log.info('Shutting down gracefully...');
   await server.close();
-  await prisma.$disconnect();
+  await db.$disconnect();
   process.exit(0);
 };
 

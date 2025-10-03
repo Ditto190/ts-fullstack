@@ -1,72 +1,57 @@
-import type { FastifyPluginAsync } from 'fastify';
-import { prisma } from '@app/db';
-import { CreatePostSchema } from '@app/db/types';
-import { validateBody } from '@app/shared/validation-middleware';
+import type { FastifyPluginAsync } from "fastify";
+import { db } from "@app/db";
+import { posts, insertPostSchema } from "@app/db";
+import { eq, desc } from "drizzle-orm";
+import { validateBody } from "@app/shared/validation-middleware";
 
 export const postRoutes: FastifyPluginAsync = async (server) => {
   // GET /api/posts - List all posts
-  server.get('/', async (request) => {
-    const { published } = request.query as { published?: string };
-
-    const posts = await prisma.post.findMany({
-      where: published !== undefined ? { published: published === 'true' } : undefined,
-      include: {
-        author: {
-          select: { id: true, email: true, name: true },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
-    });
-    return { posts };
+  server.get("/", async () => {
+    const allPosts = await db.select().from(posts).orderBy(desc(posts.createdAt));
+    return { posts: allPosts };
   });
 
   // GET /api/posts/:id - Get single post
-  server.get<{ Params: { id: string } }>('/:id', async (request, reply) => {
-    const post = await prisma.post.findUnique({
-      where: { id: request.params.id },
-      include: { author: true },
-    });
+  server.get<{ Params: { id: string } }>("/:id", async (request, reply) => {
+    const [post] = await db.select().from(posts).where(eq(posts.id, request.params.id));
 
-    if (post === null) {
-      return reply.code(404).send({ error: 'Post not found' });
+    if (post === undefined) {
+      return reply.code(404).send({ error: "Post not found" });
     }
 
     return { post };
   });
 
   // POST /api/posts - Create post
-  server.post('/', { preHandler: validateBody(CreatePostSchema) }, async (request) => {
-    const data = CreatePostSchema.parse(request.body);
-    const post = await prisma.post.create({
-      data,
-      include: { author: true },
-    });
+  server.post("/", { preHandler: validateBody(insertPostSchema) }, async (request) => {
+    const data = insertPostSchema.parse(request.body);
+    const [post] = await db.insert(posts).values(data).returning();
     return { post };
   });
 
-  // PATCH /api/posts/:id/publish - Publish post
-  server.patch<{ Params: { id: string } }>('/:id/publish', async (request, reply) => {
-    try {
-      const post = await prisma.post.update({
-        where: { id: request.params.id },
-        data: { published: true },
-        include: { author: true },
-      });
-      return { post };
-    } catch (error) {
-      return reply.code(404).send({ error: 'Post not found' });
+  // PUT /api/posts/:id - Update post
+  server.put<{ Params: { id: string } }>("/:id", async (request, reply) => {
+    const [updated] = await db
+      .update(posts)
+      .set(request.body as typeof posts.$inferInsert)
+      .where(eq(posts.id, request.params.id))
+      .returning();
+
+    if (updated === undefined) {
+      return reply.code(404).send({ error: "Post not found" });
     }
+
+    return { post: updated };
   });
 
   // DELETE /api/posts/:id - Delete post
-  server.delete<{ Params: { id: string } }>('/:id', async (request, reply) => {
-    try {
-      const post = await prisma.post.delete({
-        where: { id: request.params.id },
-      });
-      return { post };
-    } catch (error) {
-      return reply.code(404).send({ error: 'Post not found' });
+  server.delete<{ Params: { id: string } }>("/:id", async (request, reply) => {
+    const [deleted] = await db.delete(posts).where(eq(posts.id, request.params.id)).returning();
+
+    if (deleted === undefined) {
+      return reply.code(404).send({ error: "Post not found" });
     }
+
+    return { post: deleted };
   });
 };
