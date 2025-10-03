@@ -6,7 +6,6 @@
     "lib": ["ES2024"],
     "moduleResolution": "NodeNext",
     "outDir": "./dist",
-    "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
@@ -17,11 +16,14 @@
 
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@app/*": ["packages/*"],
+      "@/*": ["apps/*"]
     }
   },
   "include": [
-    "src/**/*"
+    "apps/**/*",
+    "packages/**/*",
+    "scripts/**/*"
   ],
   "exclude": [
     "node_modules",

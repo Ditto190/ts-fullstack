@@ -50,6 +50,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@adaptiveworx/ts-fullstack", "workspace:."],\
           ["@infisical/sdk", "npm:4.0.6"],\
+          ["@tsconfig/strictest", "npm:2.0.6"],\
           ["@types/node", "npm:24.6.2"],\
           ["@typescript-eslint/eslint-plugin", "virtual:65da23e18127ba31813ce0eee35abc52152281ded7431ef9680f5d7fe34326c2a69dd660067b13ef963c5773f9ca6035c24657d496ee773de8788ff03d54c1f7#npm:8.45.0"],\
           ["@typescript-eslint/parser", "virtual:65da23e18127ba31813ce0eee35abc52152281ded7431ef9680f5d7fe34326c2a69dd660067b13ef963c5773f9ca6035c24657d496ee773de8788ff03d54c1f7#npm:8.45.0"],\
@@ -74,6 +75,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@adaptiveworx/ts-fullstack", "workspace:."],\
           ["@infisical/sdk", "npm:4.0.6"],\
+          ["@tsconfig/strictest", "npm:2.0.6"],\
           ["@types/node", "npm:24.6.2"],\
           ["@typescript-eslint/eslint-plugin", "virtual:65da23e18127ba31813ce0eee35abc52152281ded7431ef9680f5d7fe34326c2a69dd660067b13ef963c5773f9ca6035c24657d496ee773de8788ff03d54c1f7#npm:8.45.0"],\
           ["@typescript-eslint/parser", "virtual:65da23e18127ba31813ce0eee35abc52152281ded7431ef9680f5d7fe34326c2a69dd660067b13ef963c5773f9ca6035c24657d496ee773de8788ff03d54c1f7#npm:8.45.0"],\
@@ -141,8 +143,9 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/db/",\
         "packageDependencies": [\
           ["@app/db", "workspace:packages/db"],\
-          ["@prisma/client", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:6.16.3"],\
-          ["prisma", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:6.16.3"],\
+          ["drizzle-orm", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:0.32.2"],\
+          ["drizzle-zod", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:0.5.1"],\
+          ["postgres", "npm:3.4.7"],\
           ["tsx", "npm:4.20.6"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"],\
           ["vitest", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:3.2.4"],\
@@ -1958,98 +1961,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["@prisma/client", [\
-      ["npm:6.16.3", {\
-        "packageLocation": "./.yarn/unplugged/@prisma-client-virtual-afddc98d39/node_modules/@prisma/client/",\
-        "packageDependencies": [\
-          ["@prisma/client", "npm:6.16.3"]\
-        ],\
-        "linkType": "SOFT"\
-      }],\
-      ["virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:6.16.3", {\
-        "packageLocation": "./.yarn/unplugged/@prisma-client-virtual-afddc98d39/node_modules/@prisma/client/",\
-        "packageDependencies": [\
-          ["@prisma/client", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:6.16.3"],\
-          ["@types/prisma", null],\
-          ["@types/typescript", null],\
-          ["prisma", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:6.16.3"],\
-          ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
-        ],\
-        "packagePeers": [\
-          "@types/prisma",\
-          "@types/typescript",\
-          "prisma",\
-          "typescript"\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["@prisma/config", [\
-      ["npm:6.16.3", {\
-        "packageLocation": "../../../../.yarn/berry/cache/@prisma-config-npm-6.16.3-0ced824b6f-10c0.zip/node_modules/@prisma/config/",\
-        "packageDependencies": [\
-          ["@prisma/config", "npm:6.16.3"],\
-          ["c12", "virtual:0ced824b6fc829710fabca9b8f46f65acce52023554c4abbf345c5f83f2652a82769f9d7626696cc4fc0d89094a154f2b47ccb7dfc6d861ce8b2656765b93bb1#npm:3.1.0"],\
-          ["deepmerge-ts", "npm:7.1.5"],\
-          ["effect", "npm:3.16.12"],\
-          ["empathic", "npm:2.0.0"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["@prisma/debug", [\
-      ["npm:6.16.3", {\
-        "packageLocation": "../../../../.yarn/berry/cache/@prisma-debug-npm-6.16.3-3eec2adcbf-10c0.zip/node_modules/@prisma/debug/",\
-        "packageDependencies": [\
-          ["@prisma/debug", "npm:6.16.3"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["@prisma/engines", [\
-      ["npm:6.16.3", {\
-        "packageLocation": "./.yarn/unplugged/@prisma-engines-npm-6.16.3-604699f9ee/node_modules/@prisma/engines/",\
-        "packageDependencies": [\
-          ["@prisma/debug", "npm:6.16.3"],\
-          ["@prisma/engines", "npm:6.16.3"],\
-          ["@prisma/engines-version", "npm:6.16.1-1.bb420e667c1820a8c05a38023385f6cc7ef8e83a"],\
-          ["@prisma/fetch-engine", "npm:6.16.3"],\
-          ["@prisma/get-platform", "npm:6.16.3"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["@prisma/engines-version", [\
-      ["npm:6.16.1-1.bb420e667c1820a8c05a38023385f6cc7ef8e83a", {\
-        "packageLocation": "../../../../.yarn/berry/cache/@prisma-engines-version-npm-6.16.1-1.bb420e667c1820a8c05a38023385f6cc7ef8e83a-ead65c9743-10c0.zip/node_modules/@prisma/engines-version/",\
-        "packageDependencies": [\
-          ["@prisma/engines-version", "npm:6.16.1-1.bb420e667c1820a8c05a38023385f6cc7ef8e83a"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["@prisma/fetch-engine", [\
-      ["npm:6.16.3", {\
-        "packageLocation": "../../../../.yarn/berry/cache/@prisma-fetch-engine-npm-6.16.3-ab8c38c751-10c0.zip/node_modules/@prisma/fetch-engine/",\
-        "packageDependencies": [\
-          ["@prisma/debug", "npm:6.16.3"],\
-          ["@prisma/engines-version", "npm:6.16.1-1.bb420e667c1820a8c05a38023385f6cc7ef8e83a"],\
-          ["@prisma/fetch-engine", "npm:6.16.3"],\
-          ["@prisma/get-platform", "npm:6.16.3"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["@prisma/get-platform", [\
-      ["npm:6.16.3", {\
-        "packageLocation": "../../../../.yarn/berry/cache/@prisma-get-platform-npm-6.16.3-b0cbd684d3-10c0.zip/node_modules/@prisma/get-platform/",\
-        "packageDependencies": [\
-          ["@prisma/debug", "npm:6.16.3"],\
-          ["@prisma/get-platform", "npm:6.16.3"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["@rolldown/pluginutils", [\
       ["npm:1.0.0-beta.27", {\
         "packageLocation": "../../../../.yarn/berry/cache/@rolldown-pluginutils-npm-1.0.0-beta.27-108701b3b0-10c0.zip/node_modules/@rolldown/pluginutils/",\
@@ -2797,15 +2708,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["@standard-schema/spec", [\
-      ["npm:1.0.0", {\
-        "packageLocation": "../../../../.yarn/berry/cache/@standard-schema-spec-npm-1.0.0-e86c6647f1-10c0.zip/node_modules/@standard-schema/spec/",\
-        "packageDependencies": [\
-          ["@standard-schema/spec", "npm:1.0.0"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["@tanstack/query-core", [\
       ["npm:5.90.2", {\
         "packageLocation": "../../../../.yarn/berry/cache/@tanstack-query-core-npm-5.90.2-6d2ae791b7-10c0.zip/node_modules/@tanstack/query-core/",\
@@ -2834,6 +2736,15 @@ const RAW_RUNTIME_STATE =
         "packagePeers": [\
           "@types/react",\
           "react"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@tsconfig/strictest", [\
+      ["npm:2.0.6", {\
+        "packageLocation": "../../../../.yarn/berry/cache/@tsconfig-strictest-npm-2.0.6-ae56c95dc9-10c0.zip/node_modules/@tsconfig/strictest/",\
+        "packageDependencies": [\
+          ["@tsconfig/strictest", "npm:2.0.6"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -3788,40 +3699,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["c12", [\
-      ["npm:3.1.0", {\
-        "packageLocation": "../../../../.yarn/berry/cache/c12-npm-3.1.0-7adf9faecd-10c0.zip/node_modules/c12/",\
-        "packageDependencies": [\
-          ["c12", "npm:3.1.0"]\
-        ],\
-        "linkType": "SOFT"\
-      }],\
-      ["virtual:0ced824b6fc829710fabca9b8f46f65acce52023554c4abbf345c5f83f2652a82769f9d7626696cc4fc0d89094a154f2b47ccb7dfc6d861ce8b2656765b93bb1#npm:3.1.0", {\
-        "packageLocation": "./.yarn/__virtual__/c12-virtual-f5d3b154a7/5/.yarn/berry/cache/c12-npm-3.1.0-7adf9faecd-10c0.zip/node_modules/c12/",\
-        "packageDependencies": [\
-          ["@types/magicast", null],\
-          ["c12", "virtual:0ced824b6fc829710fabca9b8f46f65acce52023554c4abbf345c5f83f2652a82769f9d7626696cc4fc0d89094a154f2b47ccb7dfc6d861ce8b2656765b93bb1#npm:3.1.0"],\
-          ["chokidar", "npm:4.0.3"],\
-          ["confbox", "npm:0.2.2"],\
-          ["defu", "npm:6.1.4"],\
-          ["dotenv", "npm:16.6.1"],\
-          ["exsolve", "npm:1.0.7"],\
-          ["giget", "npm:2.0.0"],\
-          ["jiti", "npm:2.6.1"],\
-          ["magicast", null],\
-          ["ohash", "npm:2.0.11"],\
-          ["pathe", "npm:2.0.3"],\
-          ["perfect-debounce", "npm:1.0.0"],\
-          ["pkg-types", "npm:2.3.0"],\
-          ["rc9", "npm:2.1.2"]\
-        ],\
-        "packagePeers": [\
-          "@types/magicast",\
-          "magicast"\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["cac", [\
       ["npm:6.7.14", {\
         "packageLocation": "../../../../.yarn/berry/cache/cac-npm-6.7.14-c46284e425-10c0.zip/node_modules/cac/",\
@@ -3939,14 +3816,6 @@ const RAW_RUNTIME_STATE =
           ["readdirp", "npm:3.6.0"]\
         ],\
         "linkType": "HARD"\
-      }],\
-      ["npm:4.0.3", {\
-        "packageLocation": "../../../../.yarn/berry/cache/chokidar-npm-4.0.3-962354fbb4-10c0.zip/node_modules/chokidar/",\
-        "packageDependencies": [\
-          ["chokidar", "npm:4.0.3"],\
-          ["readdirp", "npm:4.1.2"]\
-        ],\
-        "linkType": "HARD"\
       }]\
     ]],\
     ["chownr", [\
@@ -3954,16 +3823,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/chownr-npm-3.0.0-5275e85d25-10c0.zip/node_modules/chownr/",\
         "packageDependencies": [\
           ["chownr", "npm:3.0.0"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["citty", [\
-      ["npm:0.1.6", {\
-        "packageLocation": "../../../../.yarn/berry/cache/citty-npm-0.1.6-60b76c16d8-10c0.zip/node_modules/citty/",\
-        "packageDependencies": [\
-          ["citty", "npm:0.1.6"],\
-          ["consola", "npm:3.4.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4029,24 +3888,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/concat-map-npm-0.0.1-85a921b7ee-10c0.zip/node_modules/concat-map/",\
         "packageDependencies": [\
           ["concat-map", "npm:0.0.1"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["confbox", [\
-      ["npm:0.2.2", {\
-        "packageLocation": "../../../../.yarn/berry/cache/confbox-npm-0.2.2-5df48bb5d1-10c0.zip/node_modules/confbox/",\
-        "packageDependencies": [\
-          ["confbox", "npm:0.2.2"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["consola", [\
-      ["npm:3.4.2", {\
-        "packageLocation": "../../../../.yarn/berry/cache/consola-npm-3.4.2-133d72719e-10c0.zip/node_modules/consola/",\
-        "packageDependencies": [\
-          ["consola", "npm:3.4.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4149,24 +3990,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["deepmerge-ts", [\
-      ["npm:7.1.5", {\
-        "packageLocation": "../../../../.yarn/berry/cache/deepmerge-ts-npm-7.1.5-d78cb9df71-10c0.zip/node_modules/deepmerge-ts/",\
-        "packageDependencies": [\
-          ["deepmerge-ts", "npm:7.1.5"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["defu", [\
-      ["npm:6.1.4", {\
-        "packageLocation": "../../../../.yarn/berry/cache/defu-npm-6.1.4-c791c7f2cc-10c0.zip/node_modules/defu/",\
-        "packageDependencies": [\
-          ["defu", "npm:6.1.4"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["delayed-stream", [\
       ["npm:1.0.0", {\
         "packageLocation": "../../../../.yarn/berry/cache/delayed-stream-npm-1.0.0-c5a4c4cc02-10c0.zip/node_modules/delayed-stream/",\
@@ -4194,15 +4017,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["destr", [\
-      ["npm:2.0.5", {\
-        "packageLocation": "../../../../.yarn/berry/cache/destr-npm-2.0.5-743a0bad4e-10c0.zip/node_modules/destr/",\
-        "packageDependencies": [\
-          ["destr", "npm:2.0.5"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["didyoumean", [\
       ["npm:1.2.2", {\
         "packageLocation": "../../../../.yarn/berry/cache/didyoumean-npm-1.2.2-fd568ec571-10c0.zip/node_modules/didyoumean/",\
@@ -4221,11 +4035,142 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["dotenv", [\
-      ["npm:16.6.1", {\
-        "packageLocation": "../../../../.yarn/berry/cache/dotenv-npm-16.6.1-01334288ea-10c0.zip/node_modules/dotenv/",\
+    ["drizzle-orm", [\
+      ["npm:0.32.2", {\
+        "packageLocation": "../../../../.yarn/berry/cache/drizzle-orm-npm-0.32.2-95c7070196-10c0.zip/node_modules/drizzle-orm/",\
         "packageDependencies": [\
-          ["dotenv", "npm:16.6.1"]\
+          ["drizzle-orm", "npm:0.32.2"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:0.32.2", {\
+        "packageLocation": "./.yarn/__virtual__/drizzle-orm-virtual-d9a1609d84/5/.yarn/berry/cache/drizzle-orm-npm-0.32.2-95c7070196-10c0.zip/node_modules/drizzle-orm/",\
+        "packageDependencies": [\
+          ["@aws-sdk/client-rds-data", null],\
+          ["@cloudflare/workers-types", null],\
+          ["@electric-sql/pglite", null],\
+          ["@libsql/client", null],\
+          ["@neondatabase/serverless", null],\
+          ["@op-engineering/op-sqlite", null],\
+          ["@opentelemetry/api", null],\
+          ["@planetscale/database", null],\
+          ["@prisma/client", null],\
+          ["@tidbcloud/serverless", null],\
+          ["@types/aws-sdk__client-rds-data", null],\
+          ["@types/better-sqlite3", null],\
+          ["@types/bun-types", null],\
+          ["@types/cloudflare__workers-types", null],\
+          ["@types/electric-sql__pglite", null],\
+          ["@types/expo-sqlite", null],\
+          ["@types/knex", null],\
+          ["@types/kysely", null],\
+          ["@types/libsql__client", null],\
+          ["@types/mysql2", null],\
+          ["@types/neondatabase__serverless", null],\
+          ["@types/op-engineering__op-sqlite", null],\
+          ["@types/opentelemetry__api", null],\
+          ["@types/pg", null],\
+          ["@types/planetscale__database", null],\
+          ["@types/postgres", null],\
+          ["@types/prisma", null],\
+          ["@types/prisma__client", null],\
+          ["@types/react", null],\
+          ["@types/sql.js", null],\
+          ["@types/sqlite3", null],\
+          ["@types/tidbcloud__serverless", null],\
+          ["@types/vercel__postgres", null],\
+          ["@types/xata.io__client", null],\
+          ["@vercel/postgres", null],\
+          ["@xata.io/client", null],\
+          ["better-sqlite3", null],\
+          ["bun-types", null],\
+          ["drizzle-orm", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:0.32.2"],\
+          ["expo-sqlite", null],\
+          ["knex", null],\
+          ["kysely", null],\
+          ["mysql2", null],\
+          ["pg", null],\
+          ["postgres", "npm:3.4.7"],\
+          ["prisma", null],\
+          ["react", null],\
+          ["sql.js", null],\
+          ["sqlite3", null]\
+        ],\
+        "packagePeers": [\
+          "@aws-sdk/client-rds-data",\
+          "@cloudflare/workers-types",\
+          "@electric-sql/pglite",\
+          "@libsql/client",\
+          "@neondatabase/serverless",\
+          "@op-engineering/op-sqlite",\
+          "@opentelemetry/api",\
+          "@planetscale/database",\
+          "@prisma/client",\
+          "@tidbcloud/serverless",\
+          "@types/aws-sdk__client-rds-data",\
+          "@types/better-sqlite3",\
+          "@types/bun-types",\
+          "@types/cloudflare__workers-types",\
+          "@types/electric-sql__pglite",\
+          "@types/expo-sqlite",\
+          "@types/knex",\
+          "@types/kysely",\
+          "@types/libsql__client",\
+          "@types/mysql2",\
+          "@types/neondatabase__serverless",\
+          "@types/op-engineering__op-sqlite",\
+          "@types/opentelemetry__api",\
+          "@types/pg",\
+          "@types/planetscale__database",\
+          "@types/postgres",\
+          "@types/prisma",\
+          "@types/prisma__client",\
+          "@types/react",\
+          "@types/sql.js",\
+          "@types/sqlite3",\
+          "@types/tidbcloud__serverless",\
+          "@types/vercel__postgres",\
+          "@types/xata.io__client",\
+          "@vercel/postgres",\
+          "@xata.io/client",\
+          "better-sqlite3",\
+          "bun-types",\
+          "expo-sqlite",\
+          "knex",\
+          "kysely",\
+          "mysql2",\
+          "pg",\
+          "postgres",\
+          "prisma",\
+          "react",\
+          "sql.js",\
+          "sqlite3"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["drizzle-zod", [\
+      ["npm:0.5.1", {\
+        "packageLocation": "../../../../.yarn/berry/cache/drizzle-zod-npm-0.5.1-62eb507ad0-10c0.zip/node_modules/drizzle-zod/",\
+        "packageDependencies": [\
+          ["drizzle-zod", "npm:0.5.1"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:0.5.1", {\
+        "packageLocation": "./.yarn/__virtual__/drizzle-zod-virtual-e86628ab9a/5/.yarn/berry/cache/drizzle-zod-npm-0.5.1-62eb507ad0-10c0.zip/node_modules/drizzle-zod/",\
+        "packageDependencies": [\
+          ["@types/drizzle-orm", null],\
+          ["@types/zod", null],\
+          ["drizzle-orm", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:0.32.2"],\
+          ["drizzle-zod", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:0.5.1"],\
+          ["zod", "npm:3.25.76"]\
+        ],\
+        "packagePeers": [\
+          "@types/drizzle-orm",\
+          "@types/zod",\
+          "drizzle-orm",\
+          "zod"\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4251,17 +4196,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["effect", [\
-      ["npm:3.16.12", {\
-        "packageLocation": "../../../../.yarn/berry/cache/effect-npm-3.16.12-6b5e5637d4-10c0.zip/node_modules/effect/",\
-        "packageDependencies": [\
-          ["@standard-schema/spec", "npm:1.0.0"],\
-          ["effect", "npm:3.16.12"],\
-          ["fast-check", "npm:3.23.2"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["electron-to-chromium", [\
       ["npm:1.5.230", {\
         "packageLocation": "../../../../.yarn/berry/cache/electron-to-chromium-npm-1.5.230-2836cdf03c-10c0.zip/node_modules/electron-to-chromium/",\
@@ -4283,15 +4217,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/emoji-regex-npm-9.2.2-e6fac8d058-10c0.zip/node_modules/emoji-regex/",\
         "packageDependencies": [\
           ["emoji-regex", "npm:9.2.2"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["empathic", [\
-      ["npm:2.0.0", {\
-        "packageLocation": "../../../../.yarn/berry/cache/empathic-npm-2.0.0-440d97be6e-10c0.zip/node_modules/empathic/",\
-        "packageDependencies": [\
-          ["empathic", "npm:2.0.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4617,25 +4542,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/exponential-backoff-npm-3.1.2-e030c582de-10c0.zip/node_modules/exponential-backoff/",\
         "packageDependencies": [\
           ["exponential-backoff", "npm:3.1.2"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["exsolve", [\
-      ["npm:1.0.7", {\
-        "packageLocation": "../../../../.yarn/berry/cache/exsolve-npm-1.0.7-1a6dd6b803-10c0.zip/node_modules/exsolve/",\
-        "packageDependencies": [\
-          ["exsolve", "npm:1.0.7"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["fast-check", [\
-      ["npm:3.23.2", {\
-        "packageLocation": "../../../../.yarn/berry/cache/fast-check-npm-3.23.2-63dd857472-10c0.zip/node_modules/fast-check/",\
-        "packageDependencies": [\
-          ["fast-check", "npm:3.23.2"],\
-          ["pure-rand", "npm:6.1.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -5035,21 +4941,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["giget", [\
-      ["npm:2.0.0", {\
-        "packageLocation": "../../../../.yarn/berry/cache/giget-npm-2.0.0-1f9231b875-10c0.zip/node_modules/giget/",\
-        "packageDependencies": [\
-          ["citty", "npm:0.1.6"],\
-          ["consola", "npm:3.4.2"],\
-          ["defu", "npm:6.1.4"],\
-          ["giget", "npm:2.0.0"],\
-          ["node-fetch-native", "npm:1.6.7"],\
-          ["nypm", "npm:0.6.2"],\
-          ["pathe", "npm:2.0.3"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["glob", [\
       ["npm:10.4.5", {\
         "packageLocation": "../../../../.yarn/berry/cache/glob-npm-10.4.5-8c63175f05-10c0.zip/node_modules/glob/",\
@@ -5439,13 +5330,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/jiti-npm-1.21.7-9b00518619-10c0.zip/node_modules/jiti/",\
         "packageDependencies": [\
           ["jiti", "npm:1.21.7"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
-      ["npm:2.6.1", {\
-        "packageLocation": "../../../../.yarn/berry/cache/jiti-npm-2.6.1-597ab7fb84-10c0.zip/node_modules/jiti/",\
-        "packageDependencies": [\
-          ["jiti", "npm:2.6.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -5953,15 +5837,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["node-fetch-native", [\
-      ["npm:1.6.7", {\
-        "packageLocation": "../../../../.yarn/berry/cache/node-fetch-native-npm-1.6.7-346a13c388-10c0.zip/node_modules/node-fetch-native/",\
-        "packageDependencies": [\
-          ["node-fetch-native", "npm:1.6.7"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["node-gyp", [\
       ["npm:11.4.2", {\
         "packageLocation": "./.yarn/unplugged/node-gyp-npm-11.4.2-75a7da9a3c/node_modules/node-gyp/",\
@@ -6018,20 +5893,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["nypm", [\
-      ["npm:0.6.2", {\
-        "packageLocation": "../../../../.yarn/berry/cache/nypm-npm-0.6.2-8d0faf3552-10c0.zip/node_modules/nypm/",\
-        "packageDependencies": [\
-          ["citty", "npm:0.1.6"],\
-          ["consola", "npm:3.4.2"],\
-          ["nypm", "npm:0.6.2"],\
-          ["pathe", "npm:2.0.3"],\
-          ["pkg-types", "npm:2.3.0"],\
-          ["tinyexec", "npm:1.0.1"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["object-assign", [\
       ["npm:4.1.1", {\
         "packageLocation": "../../../../.yarn/berry/cache/object-assign-npm-4.1.1-1004ad6dec-10c0.zip/node_modules/object-assign/",\
@@ -6055,15 +5916,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/obliterator-npm-2.0.5-55b0b3e992-10c0.zip/node_modules/obliterator/",\
         "packageDependencies": [\
           ["obliterator", "npm:2.0.5"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["ohash", [\
-      ["npm:2.0.11", {\
-        "packageLocation": "../../../../.yarn/berry/cache/ohash-npm-2.0.11-11d66c7fc3-10c0.zip/node_modules/ohash/",\
-        "packageDependencies": [\
-          ["ohash", "npm:2.0.11"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6206,15 +6058,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["perfect-debounce", [\
-      ["npm:1.0.0", {\
-        "packageLocation": "../../../../.yarn/berry/cache/perfect-debounce-npm-1.0.0-0968810009-10c0.zip/node_modules/perfect-debounce/",\
-        "packageDependencies": [\
-          ["perfect-debounce", "npm:1.0.0"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["picocolors", [\
       ["npm:1.1.1", {\
         "packageLocation": "../../../../.yarn/berry/cache/picocolors-npm-1.1.1-4fede47cf1-10c0.zip/node_modules/picocolors/",\
@@ -6315,18 +6158,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/pirates-npm-4.0.7-5e4ee2f078-10c0.zip/node_modules/pirates/",\
         "packageDependencies": [\
           ["pirates", "npm:4.0.7"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["pkg-types", [\
-      ["npm:2.3.0", {\
-        "packageLocation": "../../../../.yarn/berry/cache/pkg-types-npm-2.3.0-e7381b4aaa-10c0.zip/node_modules/pkg-types/",\
-        "packageDependencies": [\
-          ["confbox", "npm:0.2.2"],\
-          ["exsolve", "npm:1.0.7"],\
-          ["pathe", "npm:2.0.3"],\
-          ["pkg-types", "npm:2.3.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6469,6 +6300,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["postgres", [\
+      ["npm:3.4.7", {\
+        "packageLocation": "../../../../.yarn/berry/cache/postgres-npm-3.4.7-d07d64dfc4-10c0.zip/node_modules/postgres/",\
+        "packageDependencies": [\
+          ["postgres", "npm:3.4.7"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["prelude-ls", [\
       ["npm:1.2.1", {\
         "packageLocation": "../../../../.yarn/berry/cache/prelude-ls-npm-1.2.1-3e4d272a55-10c0.zip/node_modules/prelude-ls/",\
@@ -6483,30 +6323,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/unplugged/prettier-npm-3.6.2-2668152203/node_modules/prettier/",\
         "packageDependencies": [\
           ["prettier", "npm:3.6.2"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["prisma", [\
-      ["npm:6.16.3", {\
-        "packageLocation": "./.yarn/unplugged/prisma-virtual-e43c3acad1/node_modules/prisma/",\
-        "packageDependencies": [\
-          ["prisma", "npm:6.16.3"]\
-        ],\
-        "linkType": "SOFT"\
-      }],\
-      ["virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:6.16.3", {\
-        "packageLocation": "./.yarn/unplugged/prisma-virtual-e43c3acad1/node_modules/prisma/",\
-        "packageDependencies": [\
-          ["@prisma/config", "npm:6.16.3"],\
-          ["@prisma/engines", "npm:6.16.3"],\
-          ["@types/typescript", null],\
-          ["prisma", "virtual:687a5591f8ba71da519d039d9cc0673681222e46e4fb227dfc581d41e0e6319e781a271356426eeefd5cb71c34bf06dbde7f4237d19ded88944ba392b0820b0d#npm:6.16.3"],\
-          ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"]\
-        ],\
-        "packagePeers": [\
-          "@types/typescript",\
-          "typescript"\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6576,15 +6392,6 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
-    ["pure-rand", [\
-      ["npm:6.1.0", {\
-        "packageLocation": "../../../../.yarn/berry/cache/pure-rand-npm-6.1.0-497ea3fc37-10c0.zip/node_modules/pure-rand/",\
-        "packageDependencies": [\
-          ["pure-rand", "npm:6.1.0"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
     ["queue-microtask", [\
       ["npm:1.2.3", {\
         "packageLocation": "../../../../.yarn/berry/cache/queue-microtask-npm-1.2.3-fcc98e4e2d-10c0.zip/node_modules/queue-microtask/",\
@@ -6599,17 +6406,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/quick-format-unescaped-npm-4.0.4-7e22c9b7dc-10c0.zip/node_modules/quick-format-unescaped/",\
         "packageDependencies": [\
           ["quick-format-unescaped", "npm:4.0.4"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["rc9", [\
-      ["npm:2.1.2", {\
-        "packageLocation": "../../../../.yarn/berry/cache/rc9-npm-2.1.2-fc8aeb8bb0-10c0.zip/node_modules/rc9/",\
-        "packageDependencies": [\
-          ["defu", "npm:6.1.4"],\
-          ["destr", "npm:2.0.5"],\
-          ["rc9", "npm:2.1.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -6728,13 +6524,6 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["picomatch", "npm:2.3.1"],\
           ["readdirp", "npm:3.6.0"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
-      ["npm:4.1.2", {\
-        "packageLocation": "../../../../.yarn/berry/cache/readdirp-npm-4.1.2-3440472afe-10c0.zip/node_modules/readdirp/",\
-        "packageDependencies": [\
-          ["readdirp", "npm:4.1.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -7323,13 +7112,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "../../../../.yarn/berry/cache/tinyexec-npm-0.3.2-381b1e349c-10c0.zip/node_modules/tinyexec/",\
         "packageDependencies": [\
           ["tinyexec", "npm:0.3.2"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
-      ["npm:1.0.1", {\
-        "packageLocation": "../../../../.yarn/berry/cache/tinyexec-npm-1.0.1-9c274034ea-10c0.zip/node_modules/tinyexec/",\
-        "packageDependencies": [\
-          ["tinyexec", "npm:1.0.1"]\
         ],\
         "linkType": "HARD"\
       }]\
