@@ -9,7 +9,7 @@
  * Falls back to environment variables if Infisical is not configured.
  */
 
-import { InfisicalClient } from '@infisical/sdk';
+import { InfisicalSDK } from '@infisical/sdk';
 
 export interface SecretManagerConfig {
   appName?: string;
@@ -17,37 +17,37 @@ export interface SecretManagerConfig {
 }
 
 export class SecretManager {
-  private readonly client: InfisicalClient;
+  private readonly client: InfisicalSDK;
   private readonly projectHierarchy: Array<{ id: string; name: string }>;
   private readonly environment: string;
   private readonly cache: Map<string, string> = new Map();
 
   constructor(config: SecretManagerConfig = {}) {
-    this.environment = config.environment ?? process.env.NODE_ENV ?? 'dev';
+    this.environment = config.environment ?? process.env["NODE_ENV"] ?? 'dev';
 
     // Build project hierarchy (most specific to least specific)
     this.projectHierarchy = [
       {
-        id: process.env.INFISICAL_APP_PROJECT_ID ?? '',
+        id: process.env["INFISICAL_APP_PROJECT_ID"] ?? '',
         name: config.appName !== undefined ? `worx-${config.appName}` : 'app-specific',
       },
       {
-        id: process.env.INFISICAL_APPS_PROJECT_ID ?? '',
+        id: process.env["INFISICAL_APPS_PROJECT_ID"] ?? '',
         name: 'worx-apps',
       },
       {
-        id: process.env.INFISICAL_PLATFORM_PROJECT_ID ?? '',
+        id: process.env["INFISICAL_PLATFORM_PROJECT_ID"] ?? '',
         name: 'worx-platform',
       },
     ].filter((p) => p.id.length > 0);
 
     // Initialize Infisical client
-    this.client = new InfisicalClient({
-      siteUrl: process.env.INFISICAL_SITE_URL ?? 'https://app.infisical.com',
+    this.client = new InfisicalSDK({
+      siteUrl: process.env["INFISICAL_SITE_URL"] ?? 'https://app.infisical.com',
       auth: {
         universalAuth: {
-          clientId: process.env.INFISICAL_CLIENT_ID ?? '',
-          clientSecret: process.env.INFISICAL_CLIENT_SECRET ?? '',
+          clientId: process.env["INFISICAL_CLIENT_ID"] ?? '',
+          clientSecret: process.env["INFISICAL_CLIENT_SECRET"] ?? '',
         },
       },
     });

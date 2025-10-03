@@ -6,7 +6,7 @@
 
 import type { FastifyRequest, FastifyReply } from 'fastify';
 import type { z } from 'zod';
-import { validateSafe } from './validation';
+import { validateSafe } from './utils/validation.js';
 
 /**
  * Validate request body

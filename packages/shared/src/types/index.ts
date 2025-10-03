@@ -1,5 +1,5 @@
-// Re-export types from @app/db
-export type { User, Post, CreateUser, CreatePost } from '@app/db/types';
+// Re-export types from @app/db (Drizzle-generated)
+export type { User, Post, NewUser, NewPost } from "@app/db";
 
 // Shared API types
 export interface ApiResponse<T> {
