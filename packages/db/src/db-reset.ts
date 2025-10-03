@@ -3,9 +3,15 @@
  * Reset database (drop all tables)
  * Usage: yarn reset
  */
-import "dotenv/config";
+import { config } from "dotenv";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
 import { sql } from "drizzle-orm";
 import { db } from "./client.js";
+
+// Load .env from monorepo root
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, "../../../.env") });
 
 async function resetDatabase() {
   console.log("🗑️  Resetting database...");

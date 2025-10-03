@@ -1,9 +1,19 @@
 #!/usr/bin/env tsx
+/**
+ * Seed database with test data
+ * Usage: yarn seed
+ */
+import { config } from "dotenv";
+import { resolve, dirname } from "path";
+import { fileURLToPath } from "url";
 import { db } from "./client.js";
 import { users, posts } from "./schema/index.js";
 
+// Load .env from monorepo root
+const __dirname = dirname(fileURLToPath(import.meta.url));
+config({ path: resolve(__dirname, "../../../.env") });
+
 async function main(): Promise<void> {
-import "dotenv/config";
   console.log("🌱 Seeding database...");
 
   // Clear existing data
