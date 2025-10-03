@@ -16,18 +16,12 @@
 
     "baseUrl": ".",
     "paths": {
-      "@app/*": ["packages/*"],
-      "@/*": ["apps/*"]
+      "@app/db": ["packages/db/src"],
+      "@app/db/*": ["packages/db/src/*"],
+      "@app/shared": ["packages/shared/src"],
+      "@app/shared/*": ["packages/shared/src/*"]
     }
   },
-  "include": [
-    "apps/**/*",
-    "packages/**/*",
-    "scripts/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "**/*.test.ts"
-  ]
+  "include": [],
+  "exclude": ["node_modules", "dist", "**/*.test.ts"]
 }
