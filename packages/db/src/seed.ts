@@ -18,6 +18,8 @@ async function main(): Promise<void> {
     })
     .returning();
 
+  if (alice === undefined) throw new Error("Failed to create alice");
+
   const [bob] = await db
     .insert(users)
     .values({
@@ -25,6 +27,8 @@ async function main(): Promise<void> {
       name: "Bob Engineer",
     })
     .returning();
+
+  if (bob === undefined) throw new Error("Failed to create bob");
 
   // Create posts for Alice
   await db.insert(posts).values([
