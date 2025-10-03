@@ -1,0 +1,19 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Prevent commits with failing validation
+echo "Running pre-commit validation..."
+
+# Run type check
+echo "→ Type checking..."
+yarn type-check || exit 1
+
+# Run linter
+echo "→ Linting..."
+yarn lint:check || exit 1
+
+# Run tests
+echo "→ Testing..."
+yarn test || exit 1
+
+echo "✅ Pre-commit validation passed!"

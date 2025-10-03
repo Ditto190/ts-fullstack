@@ -1,0 +1,49 @@
+{
+  "name": "@adaptiveworx/ts-fullstack",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "yarn@4.10.3",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "yarn workspaces foreach -pi run dev",
+    "dev:api": "yarn workspace @app/api dev",
+    "dev:web": "yarn workspace @app/web dev",
+    "build": "yarn workspaces foreach -At run build",
+    "type-check": "yarn workspaces foreach -A run type-check",
+    "lint:check": "yarn workspaces foreach -A run lint:check",
+    "test": "yarn workspaces foreach -A run test",
+    "db:generate": "yarn workspace @app/db generate",
+    "db:migrate": "yarn workspace @app/db migrate",
+    "db:studio": "yarn workspace @app/db studio",
+    "db:seed": "yarn workspace @app/db seed",
+    "docker:up": "docker-compose up -d",
+    "docker:down": "docker-compose down"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "@typescript-eslint/eslint-plugin": "^8.44.1",
+    "@typescript-eslint/parser": "^8.44.1",
+    "@vitest/coverage-v8": "^3.2.4",
+    "@vitest/ui": "^3.2.4",
+    "eslint": "^9.36.0",
+    "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "prettier": "^3.6.2",
+    "tsx": "^4.20.6",
+    "type-coverage": "^2.29.7",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  },
+  "dependencies": {
+    "@infisical/sdk": "^4.0.6",
+    "zod": "^3.25.7"
+  },
+  "engines": {
+    "node": ">=22.0.0",
+    "yarn": ">=4.0.0"
+  }
+}

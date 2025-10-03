@@ -1,0 +1,30 @@
+{
+  "name": "@app/shared",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./config": "./src/config/index.ts",
+    "./validation": "./src/utils/validation.ts",
+    "./validation-middleware": "./src/validation-middleware.ts",
+    "./types": "./src/types/index.ts"
+  },
+  "scripts": {
+    "type-check": "tsc --noEmit",
+    "lint:check": "eslint 'src/**/*.ts' --max-warnings=0",
+    "lint:fix": "eslint 'src/**/*.ts' --fix",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "build": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@infisical/sdk": "^4.0.6",
+    "zod": "^3.25.7"
+  },
+  "devDependencies": {
+    "@types/node": "^24.5.2",
+    "typescript": "^5.9.2",
+    "vitest": "^3.2.4"
+  }
+}

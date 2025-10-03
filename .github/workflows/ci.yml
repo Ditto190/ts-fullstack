@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+    branches: ["main", "develop"]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Validate Quality Thresholds
+        run: yarn quality:validate
+        env:
+          INFISICAL_PLATFORM_PROJECT_ID: ${{ secrets.INFISICAL_PLATFORM_PROJECT_ID }}
+          INFISICAL_APPS_PROJECT_ID: ${{ secrets.INFISICAL_APPS_PROJECT_ID }}
+          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
+          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+
+      - name: Lint
+        run: yarn lint:check
+
+      - name: Type Check
+        run: yarn type-check
+
+      - name: Type Coverage
+        run: yarn type-coverage
+
+      - name: Build
+        run: yarn build
+
+      - name: Test
+        run: yarn test:coverage
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
