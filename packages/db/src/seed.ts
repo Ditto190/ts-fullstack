@@ -3,6 +3,7 @@ import { db } from "./client.js";
 import { users, posts } from "./schema/index.js";
 
 async function main(): Promise<void> {
+import "dotenv/config";
   console.log("🌱 Seeding database...");
 
   // Clear existing data

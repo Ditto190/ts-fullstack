@@ -3,6 +3,7 @@
  * Reset database (drop all tables)
  * Usage: yarn reset
  */
+import "dotenv/config";
 import { sql } from "drizzle-orm";
 import { db } from "./client.js";
 

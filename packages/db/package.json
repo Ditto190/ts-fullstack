@@ -20,6 +20,7 @@
     "build": "tsc --noEmit"
   },
   "dependencies": {
+    "dotenv": "^16.4.7",
     "drizzle-orm": "^0.32.2",
     "drizzle-zod": "^0.5.1",
     "postgres": "^3.4.7",

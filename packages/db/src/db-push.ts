@@ -3,6 +3,7 @@
  * Push schema to database (for rapid local development)
  * Usage: yarn push or DATABASE_URL=<url> yarn push
  */
+import "dotenv/config";
 import { sql } from "drizzle-orm";
 import { db } from "./client.js";
 
