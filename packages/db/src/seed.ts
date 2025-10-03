@@ -1,59 +1,61 @@
-import { prisma } from './client.js';
+#!/usr/bin/env tsx
+import { db } from "./client.js";
+import { users, posts } from "./schema/index.js";
 
 async function main(): Promise<void> {
-  console.log('🌱 Seeding database...');
+  console.log("🌱 Seeding database...");
 
   // Clear existing data
-  await prisma.post.deleteMany();
-  await prisma.user.deleteMany();
+  await db.delete(posts);
+  await db.delete(users);
 
   // Create test users
-  const alice = await prisma.user.create({
-    data: {
-      email: 'alice@example.com',
-      name: 'Alice Developer',
-      posts: {
-        create: [
-          {
-            title: 'Getting Started with PERN Stack',
-            content: 'A comprehensive guide to building modern web applications...',
-            published: true,
-          },
-          {
-            title: 'Advanced TypeScript Patterns',
-            content: 'Deep dive into type safety and runtime validation...',
-            published: false,
-          },
-        ],
-      },
+  const [alice] = await db
+    .insert(users)
+    .values({
+      email: "alice@example.com",
+      name: "Alice Developer",
+    })
+    .returning();
+
+  const [bob] = await db
+    .insert(users)
+    .values({
+      email: "bob@example.com",
+      name: "Bob Engineer",
+    })
+    .returning();
+
+  // Create posts for Alice
+  await db.insert(posts).values([
+    {
+      title: "Getting Started with PERN Stack",
+      content: "A comprehensive guide to building modern web applications...",
+      published: true,
+      authorId: alice.id,
     },
+    {
+      title: "Advanced TypeScript Patterns",
+      content: "Deep dive into type safety and runtime validation...",
+      published: false,
+      authorId: alice.id,
+    },
+  ]);
+
+  // Create post for Bob
+  await db.insert(posts).values({
+    title: "Building Scalable APIs",
+    content: "Best practices for API design and implementation...",
+    published: true,
+    authorId: bob.id,
   });
 
-  const bob = await prisma.user.create({
-    data: {
-      email: 'bob@example.com',
-      name: 'Bob Engineer',
-      posts: {
-        create: [
-          {
-            title: 'Building Scalable APIs',
-            content: 'Best practices for API design and implementation...',
-            published: true,
-          },
-        ],
-      },
-    },
-  });
-
-  console.log('✅ Database seeded successfully!');
+  console.log("✅ Database seeded successfully!");
   console.log({ alice, bob });
+  process.exit(0);
 }
 
-main()
-  .catch((e) => {
-    console.error('❌ Seeding failed:', e);
-    process.exit(1);
-  })
-  .finally(async () => {
-    await prisma.$disconnect();
-  });
+main().catch((e) => {
+  console.error("❌ Seeding failed:", e);
+  process.exit(1);
+});
