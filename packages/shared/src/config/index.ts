@@ -1,1 +1,1 @@
-export { SecretManager, getSecretManager, type SecretManagerConfig } from './secrets.js';
+export { SecretManager, secretManager } from "./secrets.js";
