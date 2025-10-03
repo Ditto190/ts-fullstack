@@ -16,9 +16,8 @@
     "type-check": "yarn workspaces foreach -A run type-check",
     "lint:check": "yarn workspaces foreach -A run lint:check",
     "test": "yarn workspaces foreach -A run test",
-    "db:generate": "yarn workspace @app/db generate",
-    "db:migrate": "yarn workspace @app/db migrate",
-    "db:studio": "yarn workspace @app/db studio",
+    "db:push": "yarn workspace @app/db push",
+    "db:reset": "yarn workspace @app/db reset",
     "db:seed": "yarn workspace @app/db seed",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down"
