@@ -8,25 +8,34 @@
 # Ensure you have Node 22+
 nvm use  # Uses .nvmrc
 
-# Enable Corepack (for Yarn)
+# Enable Corepack (for Yarn 4)
 corepack enable
 
-# Install dependencies
+# Install dependencies (node-modules linker)
 yarn install
 
-# Setup Git hooks
-yarn prepare  # Installs Husky hooks
+# Setup Git hooks (if Husky is configured)
+yarn prepare  # Installs pre-commit hooks
 ```
 
 ### 2. Customize Project
 
-**Update `package.json`:**
+**Update root `package.json`:**
 ```json
 {
-  "name": "@adaptiveworx/YOUR-PROJECT-NAME",
+  "name": "@yourcompany/YOUR-PROJECT-NAME",
   "description": "Your project description",
   ...
 }
+```
+
+**Rename all packages:**
+```bash
+# Replace @adaptiveworx with your organization scope
+find apps packages envs -type f \( -name "*.json" -o -name "*.ts" -o -name "*.tsx" \) \
+  -exec sed -i '' 's/@adaptiveworx/@yourcompany/g' {} +
+
+# Update tsconfig.json paths as well
 ```
 
 **Update `README.md`:**
@@ -72,32 +81,35 @@ git commit -m "Initial commit from template-typescript-lib"
 
 ## Development Workflow
 
-### Pre-commit Hooks
+### Turborepo + Biome Workflow
 
-Husky runs these checks before every commit:
-- `yarn type-check` - TypeScript validation
-- `yarn lint:check` - ESLint (zero warnings)
-- `yarn test` - All tests must pass
-
-**To bypass (use sparingly):**
+**Fast builds with caching:**
 ```bash
-git commit --no-verify -m "WIP: temporary commit"
+yarn build              # First run: builds all packages
+yarn build              # Second run: instant (cached)
+yarn build --force      # Force rebuild
+```
+
+**Linting and formatting:**
+```bash
+yarn lint:check         # Biome: Check all files (0 warnings enforced)
+yarn lint:fix           # Biome: Auto-fix issues
 ```
 
 ### VSCode Integration
 
-Recommended extensions will be suggested on first open:
-- ESLint - Auto-fix on save
-- Prettier - Format on save
-- Vitest Explorer - Test UI
-- Error Lens - Inline errors
+Recommended extensions:
+- **Biome** - Linting + formatting (replaces ESLint + Prettier)
+- **Vitest** - Test runner UI
+- **Error Lens** - Inline errors
+- **Tailwind CSS IntelliSense** - For UI package
 
-### Quality Thresholds
+### Quality Standards
 
-Enforced by CI and pre-commit:
-- **Type coverage**: 98.5%+ (strictest)
-- **Lint warnings**: 0 (zero-warning policy)
-- **Test coverage**: 80%+
+Enforced by Turborepo + Biome:
+- **0 TypeScript errors** - Strict mode enabled
+- **0 Biome warnings** - No exceptions
+- **All tests passing** - Vitest across all packages
 
 ## Agent Collaboration
 

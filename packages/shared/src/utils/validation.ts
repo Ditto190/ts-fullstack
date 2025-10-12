@@ -23,10 +23,10 @@ export const PortNumber = z.number().int().min(1).max(65535);
 
 // Date validators
 export const ISODateString = z.string().datetime('Invalid ISO date format');
-export const FutureDateString = z.string().datetime().refine(
-  (date) => new Date(date) > new Date(),
-  'Must be a future date'
-);
+export const FutureDateString = z
+  .string()
+  .datetime()
+  .refine((date) => new Date(date) > new Date(), 'Must be a future date');
 
 /**
  * Validation result types
@@ -49,10 +49,7 @@ export type ValidationResult<T> = ValidationSuccess<T> | ValidationError;
 /**
  * Safe validation wrapper that returns result instead of throwing
  */
-export function validateSafe<T>(
-  schema: z.ZodSchema<T>,
-  data: unknown
-): ValidationResult<T> {
+export function validateSafe<T>(schema: z.ZodSchema<T>, data: unknown): ValidationResult<T> {
   const result = schema.safeParse(data);
 
   if (result.success) {
@@ -81,10 +78,7 @@ export function validate<T>(schema: z.ZodSchema<T>, data: unknown): T {
 /**
  * Async validation wrapper
  */
-export async function validateAsync<T>(
-  schema: z.ZodSchema<T>,
-  data: unknown
-): Promise<T> {
+export async function validateAsync<T>(schema: z.ZodSchema<T>, data: unknown): Promise<T> {
   return schema.parseAsync(data);
 }
 
@@ -94,8 +88,7 @@ export async function validateAsync<T>(
 export function createValidator<T>(schema: z.ZodSchema<T>) {
   return {
     validate: (data: unknown): T => validate(schema, data),
-    validateSafe: (data: unknown): ValidationResult<T> =>
-      validateSafe(schema, data),
+    validateSafe: (data: unknown): ValidationResult<T> => validateSafe(schema, data),
     validateAsync: (data: unknown): Promise<T> => validateAsync(schema, data),
     schema,
   };
@@ -159,9 +152,12 @@ export const StringToBoolean = z.string().transform((val) => {
 });
 
 // Comma-separated string to array
-export const CommaSeparatedToArray = z
-  .string()
-  .transform((val) => val.split(',').map((s) => s.trim()).filter((s) => s.length > 0));
+export const CommaSeparatedToArray = z.string().transform((val) =>
+  val
+    .split(',')
+    .map((s) => s.trim())
+    .filter((s) => s.length > 0)
+);
 
 /**
  * Runtime type guards using Zod
@@ -180,9 +176,7 @@ export function validateEnv<T extends z.ZodRawShape>(
   const result = schema.safeParse(process.env);
 
   if (!result.success) {
-    console.error('❌ Invalid environment variables:');
-    for (const error of result.error.errors) {
-      console.error(`  ${error.path.join('.')}: ${error.message}`);
+    for (const _error of result.error.errors) {
     }
     throw new Error('Environment validation failed');
   }

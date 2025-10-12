@@ -1,6 +1,6 @@
-import { Routes, Route, Link } from 'react-router-dom';
-import { UsersPage } from './pages/UsersPage.js';
+import { Link, Route, Routes } from 'react-router-dom';
 import { PostsPage } from './pages/PostsPage.js';
+import { UsersPage } from './pages/UsersPage.js';
 
 export default function App(): JSX.Element {
   return (

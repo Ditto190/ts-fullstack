@@ -1,16 +1,16 @@
-import { describe, it, expect } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { z } from 'zod';
 import {
-  validateSafe,
-  validate,
-  createValidator,
-  NonEmptyString,
-  EmailString,
-  PositiveNumber,
-  PaginationSchema,
-  isType,
-  StringToNumber,
   CommaSeparatedToArray,
+  createValidator,
+  EmailString,
+  isType,
+  NonEmptyString,
+  PaginationSchema,
+  PositiveNumber,
+  StringToNumber,
+  validate,
+  validateSafe,
 } from './validation';
 
 describe('validation utilities', () => {

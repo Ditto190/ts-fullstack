@@ -4,7 +4,7 @@
  * Request validation using Zod schemas with automatic error handling.
  */
 
-import type { FastifyRequest, FastifyReply } from 'fastify';
+import type { FastifyReply, FastifyRequest } from 'fastify';
 import type { z } from 'zod';
 import { validateSafe } from './utils/validation.js';
 
@@ -12,10 +12,7 @@ import { validateSafe } from './utils/validation.js';
  * Validate request body
  */
 export function validateBody<T extends z.ZodTypeAny>(schema: T) {
-  return async (
-    request: FastifyRequest,
-    reply: FastifyReply
-  ): Promise<void> => {
+  return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const result = validateSafe(schema, request.body);
 
     if (!result.success) {
@@ -34,10 +31,7 @@ export function validateBody<T extends z.ZodTypeAny>(schema: T) {
  * Validate query parameters
  */
 export function validateQuery<T extends z.ZodTypeAny>(schema: T) {
-  return async (
-    request: FastifyRequest,
-    reply: FastifyReply
-  ): Promise<void> => {
+  return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const result = validateSafe(schema, request.query);
 
     if (!result.success) {
@@ -55,10 +49,7 @@ export function validateQuery<T extends z.ZodTypeAny>(schema: T) {
  * Validate route params
  */
 export function validateParams<T extends z.ZodTypeAny>(schema: T) {
-  return async (
-    request: FastifyRequest,
-    reply: FastifyReply
-  ): Promise<void> => {
+  return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const result = validateSafe(schema, request.params);
 
     if (!result.success) {
@@ -78,16 +69,9 @@ export function validateParams<T extends z.ZodTypeAny>(schema: T) {
 export function validateRequest<
   TBody extends z.ZodTypeAny = z.ZodAny,
   TQuery extends z.ZodTypeAny = z.ZodAny,
-  TParams extends z.ZodTypeAny = z.ZodAny
->(config: {
-  body?: TBody;
-  query?: TQuery;
-  params?: TParams;
-}) {
-  return async (
-    request: FastifyRequest,
-    reply: FastifyReply
-  ): Promise<void> => {
+  TParams extends z.ZodTypeAny = z.ZodAny,
+>(config: { body?: TBody; query?: TQuery; params?: TParams }) {
+  return async (request: FastifyRequest, reply: FastifyReply): Promise<void> => {
     const errors: Array<{ field: string; errors: unknown }> = [];
 
     if (config.body !== undefined) {

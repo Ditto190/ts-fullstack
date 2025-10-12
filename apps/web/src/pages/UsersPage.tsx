@@ -1,3 +1,4 @@
+import { Card, CardContent, CardHeader, CardTitle } from '@adaptiveworx/ui';
 import { useQuery } from '@tanstack/react-query';
 import { api } from '../lib/api.js';
 
@@ -24,17 +25,14 @@ export function UsersPage(): JSX.Element {
   }
 
   return (
-    <div>
-      <div className="sm:flex sm:items-center">
-        <div className="sm:flex-auto">
-          <h1 className="text-2xl font-semibold text-gray-900">Users</h1>
-          <p className="mt-2 text-sm text-gray-700">A list of all users in your application.</p>
-        </div>
-      </div>
-
-      <div className="mt-8 flow-root">
-        <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-          <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle>Users</CardTitle>
+          <p className="text-sm text-gray-600">A list of all users in your application.</p>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-300">
               <thead>
                 <tr>
@@ -72,8 +70,8 @@ export function UsersPage(): JSX.Element {
               </tbody>
             </table>
           </div>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

@@ -2,76 +2,171 @@
 
 ## Overview
 
-This template uses **Infisical** for centralized secrets management with hierarchical resolution and automatic fallback to environment variables.
+This template uses **Infisical** for centralized secrets management with two approaches:
+1. **Infisical CLI Auto-Sync** (Recommended) - Automatically syncs secrets to local `.env` files
+2. **SDK Integration** - Direct API access with hierarchical resolution and fallback
 
-## Quick Start
+## Quick Start - CLI Auto-Sync (Recommended)
 
-### 1. Setup Infisical Credentials
-
-```bash
-# Copy example file
-cp .env.example .env.local
-
-# Edit with your credentials
-vim .env.local
-```
-
-**Required values:**
-```bash
-INFISICAL_CLIENT_ID=your-client-id
-INFISICAL_CLIENT_SECRET=your-client-secret
-```
-
-**Infisical project IDs (preloaded):**
-```bash
-INFISICAL_APPS_PROJECT_ID=10b63b16-515c-4ea4-adfc-1da96d654fe8  # worx-apps (baseline)
-INFISICAL_PLATFORM_PROJECT_ID=your-platform-id                   # worx-platform (fallback)
-```
-
-### 2. Load Environment
+### 1. Install Infisical CLI
 
 ```bash
-# Source credentials
-source .env.local
+# macOS
+brew install infisical/get-cli/infisical
 
-# Validate connectivity
-yarn infisical:validate
+# Linux/WSL
+curl -1sLf 'https://dl.cloudsmith.io/public/infisical/infisical-cli/setup.release.sh' | sudo -E bash
+
+# Windows
+scoop install infisical
 ```
 
-### 3. Bootstrap Secrets
+### 2. Login and Initialize
 
 ```bash
-# Load secrets from Infisical to .env.local
-yarn infisical:load
+# Login to Infisical
+infisical login
 
-# Load for specific environment
-yarn infisical:load:dev
-yarn infisical:load:stg
-yarn infisical:load:prd
-
-# Show secrets without writing (debug)
-yarn infisical:show
+# Initialize project (creates .infisical.json)
+infisical init
 ```
+
+### 3. Start Auto-Sync Daemon
+
+```bash
+# Auto-sync every 60 seconds to .env file
+infisical run --daemon --env=dev --path=/ --interval=60
+
+# Or add to package.json for convenience
+yarn secrets:sync  # Starts the daemon
+```
+
+The daemon will:
+- Automatically sync secrets to `.env` file
+- Update when secrets change in Infisical
+- Handle authentication refresh
+- Work offline after initial sync
+
+### 4. Use in Development
+
+```bash
+# Your app just reads from process.env - no SDK needed!
+yarn dev  # Reads from .env automatically
+```
+
+## Alternative: SDK Integration
+
+If you need programmatic access or dynamic updates:
+
+### 1. Setup Credentials
+
+```bash
+# Best practice: Add to ~/.zshrc or ~/.bashrc for all projects
+export INFISICAL_CLIENT_ID="your-machine-identity-client-id"
+export INFISICAL_CLIENT_SECRET="your-machine-identity-client-secret"
+export INFISICAL_APPS_PROJECT_ID="10b63b16-515c-4ea4-adfc-1da96d654fe8"
+
+# Then reload shell
+source ~/.zshrc  # or ~/.bashrc
+
+# No need for .env.local with credentials!
+```
+
+### 2. Use SecretManager
+
+```typescript
+import { secretManager } from '@adaptiveworx/shared/config';
+
+// Application secrets (from worx-apps or app-specific project)
+const apiKey = await secretManager.getRequiredSecret('API_KEY');
+
+// Platform/infrastructure secrets (from worx-platform)
+const awsKey = await secretManager.getPlatformSecret('AWS_ACCESS_KEY_ID');
+```
+
+## Approach Comparison
+
+### CLI Auto-Sync (Recommended for Most Cases)
+
+**Pros:**
+- ✅ Simple - just read from `process.env`
+- ✅ Works offline after sync
+- ✅ No custom code needed
+- ✅ Automatic updates via daemon
+- ✅ Standard `.env` workflow
+
+**Cons:**
+- ❌ Requires CLI installation
+- ❌ Secrets stored on disk (in `.env`)
+- ❌ No programmatic CRUD operations
+
+**Best for:** Local development, simple deployments, standard applications
+
+### SDK Integration (Current Implementation)
+
+**Pros:**
+- ✅ Dynamic updates without restart
+- ✅ No secrets on disk
+- ✅ Programmatic CRUD operations
+- ✅ Hierarchical project resolution
+- ✅ Works in serverless/containers
+
+**Cons:**
+- ❌ More complex setup
+- ❌ Network dependency
+- ❌ Custom caching logic
+
+**Best for:** Production, microservices, dynamic environments
 
 ## How It Works
 
-### Hierarchical Resolution
+### CLI Auto-Sync Flow
+
+```mermaid
+graph LR
+    A[Infisical Cloud] -->|Sync| B[CLI Daemon]
+    B -->|Write| C[.env file]
+    C -->|Read| D[process.env]
+    D -->|Access| E[Your App]
+    B -->|Auto-refresh<br/>every 60s| B
+```
+
+### SDK Integration Flow (Current Implementation)
+
+```mermaid
+graph TD
+    A[Your App] -->|Request| B[SecretManager]
+    B -->|Check| C{Cached?}
+    C -->|Yes| D[App Cache]
+    C -->|No| E[InfisicalSDK]
+    E -->|API Call| F[Infisical Cloud]
+    F -->|Hierarchical<br/>Resolution| G[app-specific → worx-apps]
+    G -->|Not Found| H[process.env]
+    D -->|Return| A
+    G -->|Return| A
+    H -->|Return| A
+```
+
+### Hierarchical Resolution (SDK Only)
 
 Secrets are resolved with this priority (most specific wins):
 
-1. **App-specific** (`INFISICAL_APP_PROJECT_ID` → `worx-{appname}`)
-2. **Shared apps** (`INFISICAL_APPS_PROJECT_ID` → `worx-apps`)
-3. **Platform** (`INFISICAL_PLATFORM_PROJECT_ID` → `worx-platform`)
-4. **Environment variables** (fallback)
+1. **App-specific** (`INFISICAL_APP_PROJECT_ID` → `worx-{appname}`) - Optional, for app-specific secrets
+2. **Shared apps** (`INFISICAL_APPS_PROJECT_ID` → `worx-apps`) - Default for all application secrets
+3. **Environment variables** (fallback) - Local `.env` files
+
+**Note:** `worx-platform` (`INFISICAL_PLATFORM_PROJECT_ID`) contains infrastructure/platform secrets (AWS keys, monitoring, etc.) and is managed separately, not part of the application hierarchy.
 
 **Example:**
 ```typescript
-// If INFISICAL_APP_PROJECT_ID is set:
-// Tries: worx-myapp → worx-apps → worx-platform → process.env
+// Default behavior (most common):
+// Tries: worx-apps → process.env
+const apiKey = await secretManager.getSecret('API_KEY');
 
-const sm = new SecretManager({ appName: 'myapp' });
-const apiKey = await sm.getSecret('API_KEY');
-// Searches all projects in order until found
+// With app-specific project:
+// Set INFISICAL_APP_PROJECT_ID=<your-app-project-id>
+// Tries: worx-myapp → worx-apps → process.env
+const appSpecificKey = await secretManager.getSecret('CUSTOM_API_KEY');
 ```
 
 ### SecretManager API

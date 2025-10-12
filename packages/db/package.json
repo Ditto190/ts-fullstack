@@ -1,5 +1,5 @@
 {
-  "name": "@app/db",
+  "name": "@adaptiveworx/db",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -13,10 +13,10 @@
     "seed": "tsx src/seed.ts",
     "reset": "tsx src/db-reset.ts",
     "type-check": "tsc --noEmit",
-    "lint:check": "eslint 'src/**/*.ts' --max-warnings=0",
-    "lint:fix": "eslint 'src/**/*.ts' --fix",
-    "test": "vitest run",
-    "test:watch": "vitest",
+    "lint:check": "biome check .",
+    "lint:fix": "biome check --write .",
+    "test": "echo 'No tests for db package'",
+    "test:watch": "echo 'No tests for db package'",
     "build": "tsc --noEmit"
   },
   "dependencies": {

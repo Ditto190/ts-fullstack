@@ -1,20 +1,20 @@
 #!/usr/bin/env tsx
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 /**
  * Push schema to database (for rapid local development)
  * Usage: yarn push or DATABASE_URL=<url> yarn push
  */
-import { config } from "dotenv";
-import { resolve, dirname } from "path";
-import { fileURLToPath } from "url";
-import { sql } from "drizzle-orm";
-import { db } from "./client.js";
+import { config } from 'dotenv';
+import { sql } from 'drizzle-orm';
 
-// Load .env from monorepo root
+// Load .env from monorepo root BEFORE importing client
 const __dirname = dirname(fileURLToPath(import.meta.url));
-config({ path: resolve(__dirname, "../../../.env") });
+config({ path: resolve(__dirname, '../../../.env') });
 
 async function pushSchema() {
-  console.log("📦 Pushing schema to database...");
+  // Dynamic import to ensure dotenv loads first
+  const { db } = await import('./client.js');
 
   try {
     // Create users table
@@ -43,11 +43,8 @@ async function pushSchema() {
       CREATE INDEX IF NOT EXISTS posts_author_idx ON posts(author_id);
       CREATE INDEX IF NOT EXISTS posts_published_idx ON posts(published);
     `);
-
-    console.log("✅ Schema pushed successfully!");
     process.exit(0);
-  } catch (error) {
-    console.error("❌ Failed to push schema:", error);
+  } catch (_error) {
     process.exit(1);
   }
 }

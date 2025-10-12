@@ -2,235 +2,377 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Project Type: TypeScript Library
+## Project Type: TypeScript Fullstack Monorepo
 
-**Template**: `template-typescript-lib`
-**Purpose**: Reusable TypeScript library/package (no infrastructure)
-**Target**: npm/yarn packages, shared utilities, SDKs
+**Template**: `ts-fullstack`
+**Purpose**: Production-ready PERN stack with Turborepo, Biome, and multi-environment deployment
+**Target**: Full-stack web applications, AI-powered services, internal tools, MVPs
 
 ## Collaboration Workflow
 
 **IMPORTANT**: Claude and the user follow a structured collaboration workflow:
 
 ### The 5-Step Process
-1. **Collaborate on Objectives** - Discuss and agree on library features/API
-2. **Agree on Implementation** - Decide on architecture, exported modules, public API
+1. **Collaborate on Objectives** - Discuss and agree on features to build
+2. **Agree on Architecture** - Decide on which packages to use (api, web, agent, shared, ui, db)
 3. **Claude Handles Dev/Test** - Claude writes/tests TypeScript code and ensures 100% clean code:
-   - **Recommend Tests** - Suggest appropriate tests (unit, integration)
+   - **Recommend Tests** - Suggest appropriate tests (unit, integration, e2e)
    - **Discuss Test Strategy** - Collaborate with user on what should be tested
-   - Write tests and implementation code
-   - Run `yarn build` - Fix ALL compilation errors
-   - Run `yarn lint:check` - Fix ALL linter errors and warnings
-   - Run `yarn test` - Fix ALL failing tests
-   - Run `yarn type-coverage` - Ensure 98.5%+ type coverage
+   - Write code across relevant packages
+   - Run `yarn build` (Turbo) - Fix ALL compilation errors across all packages
+   - Run `yarn lint:check` (Biome) - Fix ALL linter errors and warnings
+   - Run `yarn test` (Turbo) - Fix ALL failing tests
    - **Deliver 100% clean code** - No errors, no warnings, all tests passing
-4. **User Handles Publishing** - User manages versioning, npm publishing, releases
-5. **Review Together** - Both review exported API, documentation, examples
+4. **User Handles Deployment** - User manages Docker, database migrations, environment promotion
+5. **Review Together** - Both review cross-package integration, API contracts, UI components
 
 ### What Claude Should NOT Do
-- **DO NOT** run `npm publish` or `yarn publish` - user handles releases
-- **DO NOT** modify version in package.json without approval
-- **DO NOT** skip ahead to publishing without completing steps 1-3
+- **DO NOT** run Docker commands (user handles infrastructure)
+- **DO NOT** run database migrations in production environments
+- **DO NOT** skip ahead to deployment without completing steps 1-3
 - **DO NOT** leave ANY compilation errors, linter warnings, or failing tests
+- **DO NOT** modify version numbers in envs/*/package.json without approval
 
 ### What Claude SHOULD Do
-- Write and test all TypeScript library code
+- Write and test all TypeScript code across apps and packages
 - Recommend and discuss appropriate test strategies
-- Run builds, linters, and tests to validate code quality
+- Run Turborepo builds, Biome linting, and Vitest tests to validate code quality
 - Fix ALL errors and warnings - we're agentic, we deliver 100% clean code
-- Present commands/options for user to run
-- Ask "Should I proceed with X?" before major actions
-- Stop after step 3 and wait for user to handle publishing
+- Use shared packages (@adaptiveworx/ui, @adaptiveworx/shared) for code reuse
+- Ask "Should I proceed with X?" before major architectural changes
+- Stop after step 3 and wait for user to handle deployment
+
+## Monorepo Structure
+
+### Apps (Deployable Services)
+- **@adaptiveworx/api** - Fastify API server (apps/api)
+- **@adaptiveworx/web** - React + Vite frontend (apps/web)
+- **@adaptiveworx/agent** - AI agent service with MCP tools (apps/agent)
+
+### Packages (Shared Libraries)
+- **@adaptiveworx/db** - Drizzle ORM schemas and database client
+- **@adaptiveworx/shared** - Common types, utilities, config, Infisical integration
+- **@adaptiveworx/ui** - Shared React components (Button, Input, Card, etc.)
+
+### Environments
+- **envs/dev** - Development environment version pinning
+- **envs/stg** - Staging environment version pinning
+- **envs/prd** - Production environment version pinning
 
 ## Essential Commands
 
-### Build & Validation
-```bash
-yarn build              # TypeScript compilation
-yarn build:watch        # Watch mode for development
-yarn type-check         # Type checking without emit
-yarn type-coverage      # Verify 98.5%+ type coverage
-yarn lint:check         # ESLint validation (must pass in CI)
-yarn validate:all       # Run all validation checks
-```
+### Build & Validation (Turborepo)
+\`\`\`bash
+yarn build              # Turbo: Build all packages with caching
+yarn build --force      # Force rebuild (ignore cache)
+yarn type-check         # TypeScript compilation check (all workspaces)
+yarn lint:check         # Biome: Lint all files (0 warnings enforced)
+yarn lint:fix           # Biome: Auto-fix linting issues
+yarn test               # Turbo: Run all Vitest tests
+yarn test:coverage      # Generate coverage reports
+\`\`\`
 
-### Testing
-```bash
-yarn test               # Run all Vitest tests
-yarn test:watch         # Watch mode for development
-yarn test:unit          # Unit tests only
-yarn test:integration   # Integration tests only
-yarn test:coverage      # Generate coverage report
-yarn test:ui            # Interactive test UI
-```
+### Development
+\`\`\`bash
+yarn dev                # Turbo: Start all services in parallel (api + web + agent)
+yarn dev:api            # API only (port 3000)
+yarn dev:web            # Web only (port 5173)
+yarn dev:agent          # Agent only (port 3001)
+\`\`\`
 
-### Quality Enforcement
-```bash
-yarn quality:validate       # Validate package.json thresholds against Infisical
-yarn quality:type-coverage  # Run type-coverage with enforced Infisical threshold
-yarn quality:lint           # Run lint with enforced Infisical max-warnings
-```
+### Database
+\`\`\`bash
+yarn db:push            # Push Drizzle schema changes to database
+yarn db:reset           # Drop all tables (destructive!)
+yarn db:seed            # Seed with test data
+\`\`\`
 
-**IMPORTANT**: Quality thresholds are enforced via Infisical parameters to prevent silent relaxation:
-- `TYPE_COVERAGE_MIN`: 98.5% (minimum type coverage in strict mode)
-- `LINT_MAX_WARNINGS`: 0 (zero-warning policy)
-- `TEST_COVERAGE_MIN`: 80% (unit test coverage)
-
-Agents and developers cannot lower thresholds in `package.json` without CI failing. To adjust thresholds:
-1. Update values in Infisical (requires admin access)
-2. Run validation to propagate
-3. Update package.json to match new thresholds
-4. CI validates package.json matches or exceeds Infisical requirements
+### Docker (User Managed)
+\`\`\`bash
+yarn docker:up          # Start PostgreSQL + Redis
+yarn docker:down        # Stop containers
+\`\`\`
 
 ## Architecture Overview
 
-### Library Structure
-```
-src/
-  index.ts              # Main entry point (public API)
-  core/                 # Core functionality
-    *.ts
-    *.unit.test.ts      # Co-located unit tests
-  utils/                # Utility functions
-    *.ts
-    *.unit.test.ts
-  types/                # Type definitions
-    *.ts
-tests/
-  integration/          # Integration tests
-  fixtures/             # Test data
-  utils/                # Test utilities
-```
+### Package Dependencies
 
-### Exports Pattern
-```typescript
-// src/index.ts - Clean public API
-export { functionA, functionB } from './core/module-a';
-export { UtilityClass } from './utils/helper';
-export type { PublicType, PublicInterface } from './types';
+\`\`\`
+@adaptiveworx/api
+  ├── @adaptiveworx/db
+  ├── @adaptiveworx/shared
+  └── fastify, drizzle-orm, zod
 
-// Internal implementation stays private
-```
+@adaptiveworx/web
+  ├── @adaptiveworx/ui
+  ├── @adaptiveworx/shared
+  └── react, vite, tanstack-query
+
+@adaptiveworx/agent
+  ├── @adaptiveworx/db
+  ├── @adaptiveworx/shared
+  └── fastify, zod
+
+@adaptiveworx/ui
+  └── react, tailwindcss, clsx
+
+@adaptiveworx/shared
+  ├── @adaptiveworx/db
+  └── zod, @infisical/sdk
+
+@adaptiveworx/db
+  └── drizzle-orm, postgres
+\`\`\`
+
+### File Organization Pattern
+
+\`\`\`
+apps/api/
+  src/
+    routes/           # API endpoints
+      users.ts        # GET/POST /api/users
+      posts.ts
+    index.ts          # Fastify server setup
+
+apps/web/
+  src/
+    pages/            # React Router pages
+      UsersPage.tsx
+    lib/              # API client, utilities
+    App.tsx
+
+packages/db/
+  src/
+    schema/           # Drizzle table definitions
+      users.ts
+      posts.ts
+    client.ts         # Database connection
+    seed.ts           # Seed data
+
+packages/ui/
+  src/
+    components/
+      button/         # Button component + tests
+      input/
+      card/
+    utils/
+      cn.ts           # Tailwind class merger
+
+apps/agent/
+  src/
+    tools/            # MCP-compatible tools
+    workflows/        # Multi-step orchestrations
+    index.ts          # Agent server
+\`\`\`
 
 ## Important Patterns
 
-### TypeScript Strict Boolean Expressions
+### Turborepo Caching
+Turbo caches task outputs based on inputs. If nothing changed, tasks are skipped:
+\`\`\`bash
+yarn build          # First run: builds everything
+yarn build          # Second run: all cached, instant
+\`\`\`
 
-**Rule**: `@typescript-eslint/strict-boolean-expressions` - **ALWAYS** use explicit comparisons
+Cache is stored in \`.turbo/\` and shared across CI/CD via GitHub Actions cache.
 
-**Why This Matters**: Truthy/falsy checks can hide bugs. Empty strings (`""`), zero (`0`), and `false` are all falsy, but may be valid values.
+### Biome Linting & Formatting
+Replaces ESLint + Prettier with a single, fast tool:
+\`\`\`bash
+yarn lint:check     # Check for issues
+yarn lint:fix       # Auto-fix issues
+\`\`\`
 
-**Common Patterns:**
+Configuration in \`biome.json\`:
+- **0 warnings enforced** - No exceptions
+- **Organized imports** - Auto-sorts imports
+- **Tailwind-aware** - Handles CSS correctly
 
-```typescript
-// ❌ WRONG - Truthy/falsy checks (will cause lint errors)
-if (value) { ... }
-if (!value) { ... }
-const x = value || default;
+### Cross-Package Imports
+Use package names, not relative paths:
 
-// ✅ CORRECT - Explicit comparisons
-if (value !== undefined) { ... }
-if (value !== null) { ... }
-if (value.length > 0) { ... }  // Non-empty string/array
-const x = value ?? default;    // Nullish coalescing
+\`\`\`typescript
+// ✅ CORRECT - Use package imports
+import { db } from '@adaptiveworx/db';
+import { users } from '@adaptiveworx/db';
+import { Button } from '@adaptiveworx/ui';
+import { validateInput } from '@adaptiveworx/shared/validation';
 
-// Map.get() returns undefined if key doesn't exist
-const mapValue = map.get(key);
-if (mapValue !== undefined) { ... }  // ✅ Explicit check required
+// ❌ WRONG - Don't use relative paths across packages
+import { db } from '../../../packages/db/src/client';
+\`\`\`
 
-// Optional object properties
-if ('propertyName' in object) { ... }  // ✅ Check property exists
-if (object.optionalProp !== undefined) { ... }  // ✅ Also valid
-```
+### ESM + NodeNext Imports
+Always use \`.js\` extensions, even for \`.ts\` files:
 
-**First-Time-Right Pattern:**
-- **Strings**: Use `!== ""` or `.length > 0`
-- **Numbers**: Use `!== 0` or `> 0`
-- **Objects/Map results**: Use `!== undefined` or `!== null`
-- **Optional fields**: Use `'key' in obj` or `?? default`
-- **Nullish coalescing**: Prefer `??` over `||` for default values
+\`\`\`typescript
+// ✅ CORRECT
+import { api } from './lib/api.js';
+import { Button } from './components/Button.js';
+
+// ❌ WRONG
+import { api } from './lib/api';
+import { Button } from './components/Button';
+\`\`\`
+
+### UI Component Usage
+
+\`\`\`typescript
+// apps/web/src/pages/UsersPage.tsx
+import { Card, CardHeader, CardTitle, CardContent, Button } from '@adaptiveworx/ui';
+
+export function UsersPage() {
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Users</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <Button variant="default" onClick={handleClick}>
+          Add User
+        </Button>
+      </CardContent>
+    </Card>
+  );
+}
+\`\`\`
+
+### Database Type Safety (Drizzle)
+
+\`\`\`typescript
+// packages/db/src/schema/users.ts
+import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { createInsertSchema } from 'drizzle-zod';
+
+export const users = pgTable('users', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  email: text('email').notNull().unique(),
+  name: text('name'),
+  createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
+});
+
+export const insertUserSchema = createInsertSchema(users);
+export type User = typeof users.$inferSelect;
+export type NewUser = typeof users.$inferInsert;
+\`\`\`
+
+### API Route Pattern
+
+\`\`\`typescript
+// apps/api/src/routes/users.ts
+import { db } from '@adaptiveworx/db';
+import { users, insertUserSchema } from '@adaptiveworx/db';
+
+export async function userRoutes(server: FastifyInstance) {
+  server.get('/api/users', async () => {
+    const allUsers = await db.select().from(users);
+    return { users: allUsers };
+  });
+
+  server.post('/api/users', async (request) => {
+    const data = insertUserSchema.parse(request.body);
+    const [user] = await db.insert(users).values(data).returning();
+    return { user };
+  });
+}
+\`\`\`
 
 ### Testing Pattern
-All modules use co-located tests:
-```typescript
-// src/core/calculator.ts
-export function add(a: number, b: number): number {
-  return a + b;
-}
+Co-locate tests with source files:
 
-// src/core/calculator.unit.test.ts (co-located)
+\`\`\`typescript
+// packages/ui/src/components/button/Button.test.tsx
 import { describe, it, expect } from 'vitest';
-import { add } from './calculator';
+import { render, screen } from '@testing-library/react';
+import { Button } from './Button.js';
 
-describe('Calculator', () => {
-  it('should add two numbers', () => {
-    expect(add(2, 3)).toBe(5);
+describe('Button', () => {
+  it('renders with correct text', () => {
+    render(<Button>Click me</Button>);
+    expect(screen.getByText('Click me')).toBeInTheDocument();
   });
 });
-```
+\`\`\`
 
-### Validation Pattern
-All inputs use Zod for runtime validation:
-```typescript
-import { z } from 'zod';
+## Environment Management
 
-const InputSchema = z.object({
-  name: z.string().min(1),
-  age: z.number().positive(),
-});
+### Local Development
+Uses root \`.env\` file:
+\`\`\`bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/fullstack_dev
+PORT=3000
+AGENT_PORT=3001
+\`\`\`
 
-export function processInput(input: unknown): Result {
-  const validated = InputSchema.parse(input); // Throws on invalid
-  // ... process validated input
+### Environment Pinning
+Each environment in \`envs/{dev,stg,prd}\` pins package versions:
+
+\`\`\`json
+// envs/prd/package.json
+{
+  "dependencies": {
+    "@adaptiveworx/api": "0.2.0",
+    "@adaptiveworx/web": "0.2.0",
+    "@adaptiveworx/agent": "0.1.5"
+  }
 }
-```
+\`\`\`
+
+**Promotion Flow:**
+1. Test in dev with latest versions
+2. Update \`envs/stg/package.json\` to promote to staging
+3. Validate in staging
+4. Update \`envs/prd/package.json\` to promote to production
 
 ## Known Issues & Workarounds
 
-1. **Infisical not configured**: Falls back to package.json thresholds
-2. **Type coverage below threshold**: Use `yarn type-coverage --detail` to find untyped code
-
-## Testing Specific Components
-```bash
-# Test a specific file
-npx vitest run src/core/module.unit.test.ts
-
-# Test with pattern matching
-yarn vitest run --testNamePattern="specific test"
-
-# Debug test failures
-yarn vitest --reporter=verbose
-```
-
-## Pre-Publish Checklist
-Before publishing to npm:
-1. Run `yarn validate:all` - Must pass
-2. Run `yarn build` - TypeScript must compile
-3. Run `yarn test:coverage` - Check coverage thresholds
-4. Update version in package.json (user approval)
-5. Update CHANGELOG.md
-6. User runs `yarn publish`
+1. **Turborepo cache stale**: Run \`rm -rf .turbo && yarn build --force\`
+2. **Type errors with Drizzle**: Use type assertion: \`values(data as typeof table.$inferInsert)\`
+3. **Biome vs ESLint differences**: Biome is stricter - embrace it for better code quality
+4. **Yarn workspace resolution**: Use \`workspace:*\` for local package dependencies
 
 ## Quality Standards
 
 ### Type Safety
-- **98.5%+ type coverage** - Enforced by CI
+- **Strict TypeScript** - @tsconfig/strictest enabled
 - **Explicit return types** - All functions must declare return types
-- **No `any` types** - Use `unknown` and narrow with type guards
+- **No \`any\` types** - Use \`unknown\` and narrow with type guards
 - **Strict null checks** - Always handle undefined/null explicitly
 
 ### Testing
-- **Co-located tests** - `*.unit.test.ts` next to source
-- **Integration tests** - Cross-module tests in `tests/integration/`
-- **80%+ coverage** - Enforced by CI
-- **Test naming** - Descriptive `it('should ...')` format
+- **Co-located tests** - \`*.test.ts\` next to source
+- **Vitest** - Fast, ESM-native test runner
+- **Coverage thresholds** - Enforced per package
+- **Test naming** - Descriptive \`it('should ...')\` format
 
 ### Code Quality
-- **Zero warnings** - Linter must pass with 0 warnings
-- **Prettier formatted** - Consistent code style
+- **Zero warnings** - Biome must pass with 0 warnings
+- **Organized imports** - Auto-sorted by Biome
 - **Named exports** - Prefer named exports over default
 - **Single responsibility** - Each module has one clear purpose
 
+## Agent Workflow Example
+
+\`\`\`
+User: "Add a new 'projects' feature with API and UI"
+
+Claude:
+1. ✅ Discusses schema design with user (projects table, relations)
+2. ✅ Agrees to create: DB schema, API routes, UI components, tests
+3. ✅ Implements:
+   - packages/db/src/schema/projects.ts (Drizzle schema)
+   - apps/api/src/routes/projects.ts (CRUD endpoints)
+   - apps/web/src/pages/ProjectsPage.tsx (React UI using @adaptiveworx/ui)
+   - Tests for all components
+4. ✅ Validates:
+   - yarn build (all packages compile)
+   - yarn lint:check (0 warnings)
+   - yarn test (all tests pass)
+5. ✅ Delivers 100% clean code
+
+User: Runs database migration and deploys to dev environment
+\`\`\`
+
 ---
 
-**Remember**: We deliver 100% clean code. No shortcuts, no "TODO" comments in production, no skipped tests.
+**Remember**: We deliver 100% clean code. No shortcuts, no "TODO" comments in production, no skipped tests. Turborepo + Biome + Vitest = Fast, reliable builds every time.

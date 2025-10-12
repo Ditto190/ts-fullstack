@@ -16,12 +16,24 @@
 
     "baseUrl": ".",
     "paths": {
-      "@app/db": ["packages/db/src"],
-      "@app/db/*": ["packages/db/src/*"],
-      "@app/shared": ["packages/shared/src"],
-      "@app/shared/*": ["packages/shared/src/*"]
+      "@adaptiveworx/db": ["packages/db/src"],
+      "@adaptiveworx/db/*": ["packages/db/src/*"],
+      "@adaptiveworx/shared": ["packages/shared/src"],
+      "@adaptiveworx/shared/*": ["packages/shared/src/*"],
+      "@adaptiveworx/ui": ["packages/ui/src"],
+      "@adaptiveworx/ui/*": ["packages/ui/src/*"],
+      "@adaptiveworx/agent": ["apps/agent/src"],
+      "@adaptiveworx/agent/*": ["apps/agent/src/*"]
     }
   },
-  "include": [],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"]
+  "files": [],
+  "references": [
+    { "path": "./packages/db" },
+    { "path": "./packages/shared" },
+    { "path": "./packages/ui" },
+    { "path": "./apps/api" },
+    { "path": "./apps/web" },
+    { "path": "./apps/agent" }
+  ],
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]
 }

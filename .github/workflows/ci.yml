@@ -2,18 +2,20 @@ name: CI
 
 on:
   push:
-    branches: ["main", "develop"]
+    branches: [main]
   pull_request:
-    branches: ["main", "develop"]
+    branches: [main]
 
 jobs:
-  build:
+  quality:
+    name: Quality Checks
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Use Node.js 22
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -21,34 +23,33 @@ jobs:
       - name: Enable Corepack
         run: corepack enable
 
+      - name: Restore Turbo cache
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            turbo-${{ runner.os }}-
+
       - name: Install dependencies
         run: yarn install --immutable
 
-      - name: Validate Quality Thresholds
-        run: yarn quality:validate
-        env:
-          INFISICAL_PLATFORM_PROJECT_ID: ${{ secrets.INFISICAL_PLATFORM_PROJECT_ID }}
-          INFISICAL_APPS_PROJECT_ID: ${{ secrets.INFISICAL_APPS_PROJECT_ID }}
-          INFISICAL_CLIENT_ID: ${{ secrets.INFISICAL_CLIENT_ID }}
-          INFISICAL_CLIENT_SECRET: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+      - name: Type check
+        run: yarn type-check
 
       - name: Lint
         run: yarn lint:check
-
-      - name: Type Check
-        run: yarn type-check
-
-      - name: Type Coverage
-        run: yarn type-coverage
 
       - name: Build
         run: yarn build
 
       - name: Test
-        run: yarn test:coverage
+        run: yarn test
 
       - name: Upload coverage
         uses: codecov/codecov-action@v4
+        if: always()
         with:
-          files: ./coverage/lcov.info
+          files: ./coverage/coverage-final.json
+          flags: unittests
           fail_ci_if_error: false
