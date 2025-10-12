@@ -13,7 +13,6 @@ async function resolveDatabaseUrl(): Promise<string | undefined> {
   try {
     return await secretManager.getSecretAsync(SecretKeys.DATABASE_URL);
   } catch (error) {
-    // biome-ignore lint/suspicious/noConsole: Integration test helper logging
     console.warn('Failed to resolve DATABASE_URL via Infisical:', error);
     return undefined;
   }

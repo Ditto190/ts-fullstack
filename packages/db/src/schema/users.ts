@@ -2,6 +2,21 @@ import { index, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 
+/**
+ * @feature DB.USERS.SCHEMA
+ * @domain DB
+ * @entity USERS
+ * @operation SCHEMA
+ * @layer DB
+ * @implements
+ *   - User table with id, email, name, timestamps
+ *   - Email uniqueness constraint
+ *   - Email index for fast lookups
+ *   - Zod validation schemas
+ * @tests
+ *   - Unit: Schema validation
+ *   - Integration: Database operations
+ */
 export const users = pgTable(
   'users',
   {

@@ -12,35 +12,38 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **IMPORTANT**: Claude and the user follow a structured collaboration workflow:
 
-### The 5-Step Process
+### The 6-Step Process
 1. **Collaborate on Objectives** - Discuss and agree on features to build
-2. **Agree on Architecture** - Decide on which packages to use (api, web, agent, shared, ui, db)
-3. **Claude Handles Dev/Test** - Claude writes/tests TypeScript code and ensures 100% clean code:
-   - **Recommend Tests** - Suggest appropriate tests (unit, integration, e2e)
-   - **Discuss Test Strategy** - Collaborate with user on what should be tested
-   - Write code across relevant packages
-   - Run `yarn build` (Turbo) - Fix ALL compilation errors across all packages
-   - Run `yarn lint:check` (Biome) - Fix ALL linter errors and warnings
-   - Run `yarn test` (Turbo) - Fix ALL failing tests
-   - **Deliver 100% clean code** - No errors, no warnings, all tests passing
-4. **User Handles Deployment** - User manages Docker, database migrations, environment promotion
-5. **Review Together** - Both review cross-package integration, API contracts, UI components
+2. **Define Feature IDs** - Create semantic taxonomy IDs (e.g., `TASK.ITEM.CREATE`, `TEAM.MEMBER.INVITE`) - see [docs/FEATURE-TAXONOMY.md](docs/FEATURE-TAXONOMY.md)
+3. **Agree on Architecture** - Decide on packages (api, web, agent, shared, ui, db) and dependencies
+4. **Claude Handles Dev/Test** - Claude writes/tests TypeScript code and ensures 100% clean code:
+   - Add **@feature headers** to every implementation (source of truth)
+   - Recommend tests (unit, integration, e2e) - co-locate with code
+   - Write code across packages with explicit dependencies
+   - Run `yarn feature:validate` - Check taxonomy, dependencies, circular deps
+   - Run `yarn feature:sync` - Generate features.json from code
+   - Run `yarn build` - Fix ALL compilation errors
+   - Run `yarn lint:check` - Fix ALL linter errors/warnings
+   - Run `yarn test` - Fix ALL failing tests
+   - **Deliver 100% clean code** - No errors, no warnings, all tests pass, features documented
+5. **User Handles Deployment** - User manages Docker, database migrations, environment promotion
+6. **Review Together** - Review integration, API contracts, UI components, feature registry
 
-### What Claude Should NOT Do
-- **DO NOT** run Docker commands (user handles infrastructure)
-- **DO NOT** run database migrations in production environments
-- **DO NOT** skip ahead to deployment without completing steps 1-3
-- **DO NOT** leave ANY compilation errors, linter warnings, or failing tests
-- **DO NOT** modify version numbers in envs/*/package.json without approval
+### What Claude MUST Do
+- Add **@feature header** to every implementation (mandatory)
+- Run `yarn feature:validate && yarn feature:sync` before build
+- Co-locate tests with code (*.test.ts next to *.ts)
+- Declare explicit feature dependencies in @feature headers
+- Fix ALL errors/warnings - deliver 100% clean code
+- Use shared packages (@adaptiveworx/ui, @adaptiveworx/shared)
 
-### What Claude SHOULD Do
-- Write and test all TypeScript code across apps and packages
-- Recommend and discuss appropriate test strategies
-- Run Turborepo builds, Biome linting, and Vitest tests to validate code quality
-- Fix ALL errors and warnings - we're agentic, we deliver 100% clean code
-- Use shared packages (@adaptiveworx/ui, @adaptiveworx/shared) for code reuse
-- Ask "Should I proceed with X?" before major architectural changes
-- Stop after step 3 and wait for user to handle deployment
+### What Claude Must NOT Do
+- Skip @feature headers ("I'll add them later")
+- Create features without taxonomy discussion
+- Run Docker commands (user handles infrastructure)
+- Run database migrations in production
+- Leave ANY errors, warnings, or failing tests
+- Modify envs/*/package.json versions without approval
 
 ## Monorepo Structure
 
@@ -351,28 +354,75 @@ Each environment in \`envs/{dev,stg,prd}\` pins package versions:
 - **Named exports** - Prefer named exports over default
 - **Single responsibility** - Each module has one clear purpose
 
+## Feature Taxonomy Quick Reference
+
+### Structure
+\`\`\`
+<DOMAIN>.<ENTITY>.<OPERATION>[.<QUALIFIER>]*
+
+Examples: TASK.ITEM.CREATE, TEAM.MEMBER.INVITE, USER.PROFILE.UPDATE
+\`\`\`
+
+### Standard Domains
+**AUTH** | **USER** | **TEAM** | **PROJECT** | **TASK** | **API** | **DB** | **UI** | **AGENT** | **INFRA**
+
+### Standard Operations
+**CREATE** | **READ** | **LIST** | **UPDATE** | **DELETE** | **VALIDATE** | **SEARCH** | **EXPORT** | **IMPORT** | **SYNC**
+
+### Feature Header Template
+\`\`\`typescript
+/**
+ * @feature DOMAIN.ENTITY.OPERATION
+ * @domain DOMAIN
+ * @entity ENTITY
+ * @operation OPERATION
+ * @layer API|DB|UI|AGENT
+ * @dependencies [FEATURE_ID, FEATURE_ID]
+ * @implements
+ *   - Implementation detail 1
+ *   - Implementation detail 2
+ * @tests
+ *   - Test description 1
+ *   - Test description 2
+ */
+export function featureName() { ... }
+\`\`\`
+
+### Commands
+\`\`\`bash
+yarn feature:validate           # Check taxonomy, dependencies, circular deps
+yarn feature:sync               # Generate features.json from @feature headers
+yarn feature:search TASK.*      # Find features by pattern
+\`\`\`
+
+**Full documentation**: [docs/FEATURE-TAXONOMY.md](docs/FEATURE-TAXONOMY.md)
+
 ## Agent Workflow Example
 
 \`\`\`
 User: "Add a new 'projects' feature with API and UI"
 
 Claude:
-1. ✅ Discusses schema design with user (projects table, relations)
-2. ✅ Agrees to create: DB schema, API routes, UI components, tests
-3. ✅ Implements:
-   - packages/db/src/schema/projects.ts (Drizzle schema)
-   - apps/api/src/routes/projects.ts (CRUD endpoints)
-   - apps/web/src/pages/ProjectsPage.tsx (React UI using @adaptiveworx/ui)
-   - Tests for all components
+1. ✅ Discusses schema design and proposes feature IDs:
+   - DB.SCHEMA.PROJECTS, PROJECT.ITEM.CREATE, PROJECT.ITEM.LIST
+   - UI.PROJECT.ITEM.CREATE.FORM, UI.PROJECT.ITEM.LIST.TABLE
+2. ✅ Agrees on architecture and dependencies
+3. ✅ Implements with @feature headers:
+   - packages/db/src/schema/projects.ts (DB.SCHEMA.PROJECTS)
+   - apps/api/src/routes/projects.ts (PROJECT.ITEM.CREATE, PROJECT.ITEM.LIST)
+   - apps/web/src/pages/ProjectsPage.tsx (UI components)
+   - Co-located tests for all layers
 4. ✅ Validates:
+   - yarn feature:validate (taxonomy check)
+   - yarn feature:sync (generate registry)
    - yarn build (all packages compile)
    - yarn lint:check (0 warnings)
    - yarn test (all tests pass)
-5. ✅ Delivers 100% clean code
+5. ✅ Delivers 100% clean code with feature documentation
 
-User: Runs database migration and deploys to dev environment
+User: Reviews features.json, runs database migration, deploys to dev
 \`\`\`
 
 ---
 
-**Remember**: We deliver 100% clean code. No shortcuts, no "TODO" comments in production, no skipped tests. Turborepo + Biome + Vitest = Fast, reliable builds every time.
+**Remember**: We deliver 100% clean code with full feature documentation. Every implementation gets an @feature header. No shortcuts, no "TODO" comments, no skipped tests. Turborepo + Biome + Vitest + Feature Taxonomy = Fast, reliable, maintainable builds every time.

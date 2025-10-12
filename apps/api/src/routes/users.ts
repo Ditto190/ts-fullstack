@@ -5,7 +5,20 @@ import type { FastifyPluginAsync } from 'fastify';
 import { mapUserWithCounts } from './users.helpers.js';
 
 export const userRoutes: FastifyPluginAsync = async (server) => {
-  // GET /api/users - List all users
+  /**
+   * @feature USER.ITEM.LIST
+   * @domain USER
+   * @entity ITEM
+   * @operation LIST
+   * @layer API
+   * @dependencies [DB.USERS.SCHEMA, DB.POSTS.SCHEMA]
+   * @implements
+   *   - GET /api/users endpoint
+   *   - Aggregate posts count per user
+   *   - Order by creation date descending
+   * @tests
+   *   - Integration: List users with counts
+   */
   server.get('/', async () => {
     const allUsers = await db
       .select({
@@ -24,7 +37,21 @@ export const userRoutes: FastifyPluginAsync = async (server) => {
     return { users: allUsers.map(mapUserWithCounts) };
   });
 
-  // GET /api/users/:id - Get single user
+  /**
+   * @feature USER.ITEM.READ
+   * @domain USER
+   * @entity ITEM
+   * @operation READ
+   * @layer API
+   * @dependencies [DB.USERS.SCHEMA, DB.POSTS.SCHEMA]
+   * @implements
+   *   - GET /api/users/:id endpoint
+   *   - Fetch single user with posts count
+   *   - 404 if user not found
+   * @tests
+   *   - Integration: Get user by ID
+   *   - Integration: 404 for non-existent user
+   */
   server.get<{ Params: { id: string } }>('/:id', async (request, reply) => {
     const [user] = await db
       .select({
@@ -47,7 +74,23 @@ export const userRoutes: FastifyPluginAsync = async (server) => {
     return { user: mapUserWithCounts(user) };
   });
 
-  // POST /api/users - Create user
+  /**
+   * @feature USER.ITEM.CREATE
+   * @domain USER
+   * @entity ITEM
+   * @operation CREATE
+   * @layer API
+   * @dependencies [DB.USERS.SCHEMA]
+   * @implements
+   *   - POST /api/users endpoint
+   *   - Zod validation via middleware
+   *   - Insert user into database
+   *   - Return created user
+   * @tests
+   *   - Integration: Create valid user
+   *   - Integration: Reject invalid email
+   *   - Integration: Enforce email uniqueness
+   */
   server.post('/', { preHandler: validateBody(insertUserSchema) }, async (request) => {
     const data = insertUserSchema.parse(request.body);
     // Type assertion needed due to exactOptionalPropertyTypes + Drizzle insert types
@@ -58,7 +101,23 @@ export const userRoutes: FastifyPluginAsync = async (server) => {
     return { user };
   });
 
-  // DELETE /api/users/:id - Delete user
+  /**
+   * @feature USER.ITEM.DELETE
+   * @domain USER
+   * @entity ITEM
+   * @operation DELETE
+   * @layer API
+   * @dependencies [DB.USERS.SCHEMA]
+   * @implements
+   *   - DELETE /api/users/:id endpoint
+   *   - Remove user from database
+   *   - Cascade delete related posts
+   *   - 404 if user not found
+   * @tests
+   *   - Integration: Delete existing user
+   *   - Integration: 404 for non-existent user
+   *   - Integration: Verify cascade delete of posts
+   */
   server.delete<{ Params: { id: string } }>('/:id', async (request, reply) => {
     const [deleted] = await db.delete(users).where(eq(users.id, request.params.id)).returning();
 

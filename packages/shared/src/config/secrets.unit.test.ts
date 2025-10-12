@@ -2,6 +2,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { InfisicalManager } from './infisical.js';
 import { SecretKeys, SecretManager } from './secrets.js';
 
+// Helper to safely access mocked methods (all methods are defined in mock)
+function getMock<T>(fn: T | undefined): T {
+  // biome-ignore lint/style/noNonNullAssertion: Test helper - all mock methods are defined
+  return fn!;
+}
+
 describe('SecretManager', () => {
   let secretManager: SecretManager;
   let mockInfisicalManager: Partial<InfisicalManager>;
@@ -70,7 +76,7 @@ describe('SecretManager', () => {
 
   describe('async methods with Infisical integration', () => {
     it('should initialize on first async call', async () => {
-      vi.mocked(mockInfisicalManager.getSecret!).mockResolvedValue('async-value');
+      vi.mocked(getMock(mockInfisicalManager.getSecret)).mockResolvedValue('async-value');
 
       await secretManager.getSecretAsync('TEST_KEY');
 
@@ -78,7 +84,7 @@ describe('SecretManager', () => {
     });
 
     it('should only initialize once', async () => {
-      vi.mocked(mockInfisicalManager.getSecret!).mockResolvedValue('value');
+      vi.mocked(getMock(mockInfisicalManager.getSecret)).mockResolvedValue('value');
 
       await secretManager.getSecretAsync('KEY1');
       await secretManager.getSecretAsync('KEY2');
@@ -88,7 +94,7 @@ describe('SecretManager', () => {
     });
 
     it('getSecretAsync should use Infisical manager', async () => {
-      vi.mocked(mockInfisicalManager.getSecret!).mockResolvedValue('infisical-value');
+      vi.mocked(getMock(mockInfisicalManager.getSecret)).mockResolvedValue('infisical-value');
 
       const result = await secretManager.getSecretAsync('TEST_KEY', { path: '/api' });
 
@@ -97,7 +103,7 @@ describe('SecretManager', () => {
     });
 
     it('getSecretAsync should throw when required and missing', async () => {
-      vi.mocked(mockInfisicalManager.getSecret!).mockResolvedValue(undefined);
+      vi.mocked(getMock(mockInfisicalManager.getSecret)).mockResolvedValue(undefined);
 
       await expect(secretManager.getSecretAsync('MISSING', { required: true })).rejects.toThrow(
         "Required secret 'MISSING' not found"
@@ -105,7 +111,9 @@ describe('SecretManager', () => {
     });
 
     it('getRequiredSecret should delegate to Infisical manager', async () => {
-      vi.mocked(mockInfisicalManager.getRequiredSecret!).mockResolvedValue('required-value');
+      vi.mocked(getMock(mockInfisicalManager.getRequiredSecret)).mockResolvedValue(
+        'required-value'
+      );
 
       const result = await secretManager.getRequiredSecret('REQUIRED_KEY');
 
@@ -117,7 +125,7 @@ describe('SecretManager', () => {
     });
 
     it('getSecrets should fetch multiple secrets', async () => {
-      vi.mocked(mockInfisicalManager.getSecrets!).mockResolvedValue({
+      vi.mocked(getMock(mockInfisicalManager.getSecrets)).mockResolvedValue({
         KEY1: 'value1',
         KEY2: 'value2',
         KEY3: undefined,
@@ -137,7 +145,7 @@ describe('SecretManager', () => {
     });
 
     it('getSecretOrDefaultAsync should return default for missing secret', async () => {
-      vi.mocked(mockInfisicalManager.getSecret!).mockResolvedValue(undefined);
+      vi.mocked(getMock(mockInfisicalManager.getSecret)).mockResolvedValue(undefined);
 
       const result = await secretManager.getSecretOrDefaultAsync('MISSING', 'fallback');
 
@@ -145,7 +153,7 @@ describe('SecretManager', () => {
     });
 
     it('hasSecretAsync should check via Infisical', async () => {
-      vi.mocked(mockInfisicalManager.getSecret!)
+      vi.mocked(getMock(mockInfisicalManager.getSecret))
         .mockResolvedValueOnce('exists')
         .mockResolvedValueOnce(undefined);
 
@@ -219,7 +227,7 @@ describe('SecretManager', () => {
         },
       ];
 
-      vi.mocked(mockInfisicalManager.listSecrets!).mockResolvedValue(mockSecrets);
+      vi.mocked(getMock(mockInfisicalManager.listSecrets)).mockResolvedValue(mockSecrets);
 
       const result = await secretManager.listSecrets({ environment: 'prod' });
 
@@ -235,7 +243,7 @@ describe('SecretManager', () => {
 
   describe('validation and utilities', () => {
     it('should validate required secrets', async () => {
-      vi.mocked(mockInfisicalManager.getSecrets!).mockResolvedValue({
+      vi.mocked(getMock(mockInfisicalManager.getSecrets)).mockResolvedValue({
         REQUIRED1: 'value1',
         REQUIRED2: 'value2',
         REQUIRED3: undefined,
@@ -254,7 +262,7 @@ describe('SecretManager', () => {
     });
 
     it('should load common application secrets', async () => {
-      vi.mocked(mockInfisicalManager.getSecrets!).mockImplementation(async (keys) => {
+      vi.mocked(getMock(mockInfisicalManager.getSecrets)).mockImplementation(async (keys) => {
         const mockValues: Record<string, string | undefined> = {
           [SecretKeys.DATABASE_URL]: 'postgres://localhost:5432/db',
           [SecretKeys.PORT]: '3000',
@@ -294,7 +302,7 @@ describe('SecretManager', () => {
 
     it('should get cache stats', () => {
       const mockStats = { size: 5, keys: ['KEY1', 'KEY2'] };
-      vi.mocked(mockInfisicalManager.getCacheStats!).mockReturnValue(mockStats);
+      vi.mocked(getMock(mockInfisicalManager.getCacheStats)).mockReturnValue(mockStats);
 
       const stats = secretManager.getCacheStats();
 

@@ -3,6 +3,23 @@ import { createInsertSchema, createSelectSchema } from 'drizzle-zod';
 import { z } from 'zod';
 import { users } from './users.js';
 
+/**
+ * @feature DB.POSTS.SCHEMA
+ * @domain DB
+ * @entity POSTS
+ * @operation SCHEMA
+ * @layer DB
+ * @dependencies [DB.USERS.SCHEMA]
+ * @implements
+ *   - Post table with title, content, published status
+ *   - Foreign key to users (author)
+ *   - Cascade delete when user is deleted
+ *   - Indexes on authorId and published status
+ *   - Zod validation schemas
+ * @tests
+ *   - Unit: Schema validation
+ *   - Integration: Foreign key constraints
+ */
 export const posts = pgTable(
   'posts',
   {

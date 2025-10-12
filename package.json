@@ -25,7 +25,10 @@
     "db:reset": "yarn workspace @adaptiveworx/db reset",
     "db:seed": "yarn workspace @adaptiveworx/db seed",
     "docker:up": "docker-compose up -d",
-    "docker:down": "docker-compose down"
+    "docker:down": "docker-compose down",
+    "feature:sync": "tsx scripts/feature-sync.ts",
+    "feature:validate": "tsx scripts/feature-validate.ts",
+    "feature:search": "tsx scripts/feature-search.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.2.5",
