@@ -3,7 +3,6 @@ import { validateBody } from '@adaptiveworx/shared/validation-middleware';
 import { desc, eq, sql } from 'drizzle-orm';
 import type { FastifyPluginAsync } from 'fastify';
 import { mapUserWithCounts } from './users.helpers.js';
-export type { UserWithCounts } from './users.helpers.js';
 
 export const userRoutes: FastifyPluginAsync = async (server) => {
   // GET /api/users - List all users

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { User, Post } from './schema/index.js';
 
 // Additional runtime validation schemas (beyond Drizzle-generated)
 // Note: Basic validation is in schema/*.ts via drizzle-zod
@@ -24,3 +25,12 @@ export const PostRuntimeSchema = z.object({
 // Re-export for convenience
 export type UserRuntime = z.infer<typeof UserRuntimeSchema>;
 export type PostRuntime = z.infer<typeof PostRuntimeSchema>;
+
+// Extended types for API responses
+export type UserWithCounts = User & {
+  postsCount: number;
+};
+
+export type PostWithAuthor = Post & {
+  author: User | null;
+};

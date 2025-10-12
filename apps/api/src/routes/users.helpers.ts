@@ -1,3 +1,5 @@
+import type { UserWithCounts } from '@adaptiveworx/db';
+
 export type UserAggregateRow = {
   id: string;
   email: string;
@@ -7,12 +9,6 @@ export type UserAggregateRow = {
   postsCount: number | null;
 };
 
-export type UserWithCounts = Omit<UserAggregateRow, 'postsCount'> & {
-  _count: {
-    posts: number;
-  };
-};
-
 export function mapUserWithCounts(row: UserAggregateRow): UserWithCounts {
   return {
     id: row.id,
@@ -20,8 +16,6 @@ export function mapUserWithCounts(row: UserAggregateRow): UserWithCounts {
     name: row.name,
     createdAt: row.createdAt,
     updatedAt: row.updatedAt,
-    _count: {
-      posts: Number(row.postsCount ?? 0),
-    },
+    postsCount: Number(row.postsCount ?? 0),
   };
 }
