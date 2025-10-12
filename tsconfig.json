@@ -10,7 +10,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "removeComments": false,
-
+    "composite": true,
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
 
@@ -26,7 +26,6 @@
       "@adaptiveworx/agent/*": ["apps/agent/src/*"]
     }
   },
-  "files": [],
   "references": [
     { "path": "./packages/db" },
     { "path": "./packages/shared" },
@@ -34,6 +33,5 @@
     { "path": "./apps/api" },
     { "path": "./apps/web" },
     { "path": "./apps/agent" }
-  ],
-  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.test.tsx"]
+  ]
 }
