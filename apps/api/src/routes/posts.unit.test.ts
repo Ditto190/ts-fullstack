@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import {
-  mapPostWithAuthor,
-  type PostQueryResult,
-  type PostWithAuthor,
-} from './posts.helpers.js';
+import { mapPostWithAuthor, type PostQueryResult, type PostWithAuthor } from './posts.helpers.js';
 
 const mockPost = {
   id: 'post-1',

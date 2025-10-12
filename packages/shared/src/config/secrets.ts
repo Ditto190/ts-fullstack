@@ -14,7 +14,7 @@
  * - Hierarchical resolution: app-specific -> apps shared -> platform -> env vars
  */
 
-import { infisical, type InfisicalManager } from './infisical.js';
+import { type InfisicalManager, infisical } from './infisical.js';
 
 /**
  * Common secret keys used across the application
@@ -57,7 +57,7 @@ export const SecretKeys = {
   NEW_RELIC_LICENSE_KEY: 'NEW_RELIC_LICENSE_KEY',
 } as const;
 
-export type SecretKey = typeof SecretKeys[keyof typeof SecretKeys];
+export type SecretKey = (typeof SecretKeys)[keyof typeof SecretKeys];
 
 /**
  * Enhanced SecretManager that wraps Infisical integration
@@ -96,7 +96,7 @@ export class SecretManager {
       // Log error in development, but don't fail - fall back to env vars
       if (process.env['NODE_ENV'] === 'development') {
         // In development, log a warning but continue
-        // eslint-disable-next-line no-console
+        // biome-ignore lint/suspicious/noConsole: Development-only warning for Infisical fallback
         console.warn('Infisical initialization failed, using environment variables:', error);
       }
       // Mark as initialized to prevent retry attempts
@@ -115,7 +115,7 @@ export class SecretManager {
     if (value === undefined || value === '') {
       throw new Error(
         `Secret '${key}' not found in environment variables. ` +
-        `Use getSecretAsync() for Infisical integration or ensure the variable is set.`
+          `Use getSecretAsync() for Infisical integration or ensure the variable is set.`
       );
     }
     return value;
@@ -124,7 +124,10 @@ export class SecretManager {
   /**
    * Get a secret asynchronously with full Infisical integration
    */
-  async getSecretAsync(key: string, options?: { projectId?: string; path?: string; required?: boolean }): Promise<string | undefined> {
+  async getSecretAsync(
+    key: string,
+    options?: { projectId?: string; path?: string; required?: boolean }
+  ): Promise<string | undefined> {
     await this.initialize();
 
     const value = await this.infisicalManager.getSecret(key, options);
@@ -132,7 +135,7 @@ export class SecretManager {
     if (options?.required && !value) {
       throw new Error(
         `Required secret '${key}' not found. ` +
-        `Ensure it exists in Infisical or environment variables.`
+          `Ensure it exists in Infisical or environment variables.`
       );
     }
 
@@ -142,7 +145,10 @@ export class SecretManager {
   /**
    * Get a required secret (throws if not found)
    */
-  async getRequiredSecret(key: string, options?: { projectId?: string; path?: string }): Promise<string> {
+  async getRequiredSecret(
+    key: string,
+    options?: { projectId?: string; path?: string }
+  ): Promise<string> {
     await this.initialize();
     return this.infisicalManager.getRequiredSecret(key, options);
   }
@@ -150,7 +156,10 @@ export class SecretManager {
   /**
    * Get multiple secrets at once
    */
-  async getSecrets(keys: string[], options?: { projectId?: string; path?: string }): Promise<Record<string, string | undefined>> {
+  async getSecrets(
+    keys: string[],
+    options?: { projectId?: string; path?: string }
+  ): Promise<Record<string, string | undefined>> {
     await this.initialize();
     return this.infisicalManager.getSecrets(keys, options);
   }
@@ -167,7 +176,11 @@ export class SecretManager {
   /**
    * Get a secret with a default fallback (asynchronous, full integration)
    */
-  async getSecretOrDefaultAsync(key: string, defaultValue: string, options?: { projectId?: string; path?: string }): Promise<string> {
+  async getSecretOrDefaultAsync(
+    key: string,
+    defaultValue: string,
+    options?: { projectId?: string; path?: string }
+  ): Promise<string> {
     const value = await this.getSecretAsync(key, options);
     return value || defaultValue;
   }
@@ -184,7 +197,10 @@ export class SecretManager {
   /**
    * Check if a secret exists (asynchronous, full integration)
    */
-  async hasSecretAsync(key: string, options?: { projectId?: string; path?: string }): Promise<boolean> {
+  async hasSecretAsync(
+    key: string,
+    options?: { projectId?: string; path?: string }
+  ): Promise<boolean> {
     const value = await this.getSecretAsync(key, options);
     return value !== undefined && value !== '';
   }
@@ -192,7 +208,11 @@ export class SecretManager {
   /**
    * Create a new secret in Infisical
    */
-  async createSecret(key: string, value: string, options?: { projectId?: string; path?: string; comment?: string; tags?: string[] }): Promise<void> {
+  async createSecret(
+    key: string,
+    value: string,
+    options?: { projectId?: string; path?: string; comment?: string; tags?: string[] }
+  ): Promise<void> {
     await this.initialize();
     await this.infisicalManager.createSecret({
       key,
@@ -204,7 +224,11 @@ export class SecretManager {
   /**
    * Update an existing secret in Infisical
    */
-  async updateSecret(key: string, value: string, options?: { projectId?: string; path?: string; comment?: string }): Promise<void> {
+  async updateSecret(
+    key: string,
+    value: string,
+    options?: { projectId?: string; path?: string; comment?: string }
+  ): Promise<void> {
     await this.initialize();
     await this.infisicalManager.updateSecret({
       key,
@@ -227,10 +251,14 @@ export class SecretManager {
   /**
    * List all available secrets
    */
-  async listSecrets(options?: { projectId?: string; path?: string; environment?: string }): Promise<Array<{ key: string; value: string; updatedAt: Date }>> {
+  async listSecrets(options?: {
+    projectId?: string;
+    path?: string;
+    environment?: string;
+  }): Promise<Array<{ key: string; value: string; updatedAt: Date }>> {
     await this.initialize();
     const secrets = await this.infisicalManager.listSecrets(options);
-    return secrets.map(s => ({
+    return secrets.map((s) => ({
       key: s.key,
       value: s.value,
       updatedAt: s.updatedAt,
@@ -265,7 +293,7 @@ export class SecretManager {
   async validateRequiredSecrets(keys: string[]): Promise<{ valid: boolean; missing: string[] }> {
     await this.initialize();
     const secrets = await this.getSecrets(keys);
-    const missing = keys.filter(key => !secrets[key]);
+    const missing = keys.filter((key) => !secrets[key]);
 
     return {
       valid: missing.length === 0,
@@ -277,9 +305,23 @@ export class SecretManager {
    * Load common application secrets
    */
   async loadCommonSecrets(): Promise<{
-    database: { url?: string | undefined; poolMin?: string | undefined; poolMax?: string | undefined };
-    api: { port?: string | undefined; host?: string | undefined; corsOrigin?: string | undefined; jwtSecret?: string | undefined };
-    redis: { url?: string | undefined; host?: string | undefined; port?: string | undefined; password?: string | undefined };
+    database: {
+      url?: string | undefined;
+      poolMin?: string | undefined;
+      poolMax?: string | undefined;
+    };
+    api: {
+      port?: string | undefined;
+      host?: string | undefined;
+      corsOrigin?: string | undefined;
+      jwtSecret?: string | undefined;
+    };
+    redis: {
+      url?: string | undefined;
+      host?: string | undefined;
+      port?: string | undefined;
+      password?: string | undefined;
+    };
   }> {
     await this.initialize();
 

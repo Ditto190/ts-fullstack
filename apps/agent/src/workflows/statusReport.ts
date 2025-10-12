@@ -1,6 +1,6 @@
 import { z } from 'zod';
-import { executeTool, type ToolName } from '../tools/index.js';
 import type { ApiHealthCheckResult } from '../tools/apiHealthCheck.js';
+import { executeTool, type ToolName } from '../tools/index.js';
 
 const StatusReportInputSchema = z.object({
   baseUrl: z.string().url().optional(),

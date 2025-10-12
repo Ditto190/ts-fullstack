@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { User, Post } from './schema/index.js';
+import type { Post, User } from './schema/index.js';
 
 // Additional runtime validation schemas (beyond Drizzle-generated)
 // Note: Basic validation is in schema/*.ts via drizzle-zod

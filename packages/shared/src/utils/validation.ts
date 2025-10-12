@@ -49,7 +49,10 @@ export type ValidationResult<T> = ValidationSuccess<T> | ValidationError;
 /**
  * Safe validation wrapper that returns result instead of throwing
  */
-export function validateSafe<T>(schema: z.ZodSchema<T>, data: unknown): ValidationResult<T> {
+export function validateSafe<Output, Input = unknown>(
+  schema: z.ZodType<Output, z.ZodTypeDef, Input>,
+  data: unknown
+): ValidationResult<Output> {
   const result = schema.safeParse(data);
 
   if (result.success) {
@@ -71,25 +74,33 @@ export function validateSafe<T>(schema: z.ZodSchema<T>, data: unknown): Validati
 /**
  * Validation that throws on error (for use in try/catch)
  */
-export function validate<T>(schema: z.ZodSchema<T>, data: unknown): T {
+export function validate<Output, Input = unknown>(
+  schema: z.ZodType<Output, z.ZodTypeDef, Input>,
+  data: unknown
+): Output {
   return schema.parse(data);
 }
 
 /**
  * Async validation wrapper
  */
-export async function validateAsync<T>(schema: z.ZodSchema<T>, data: unknown): Promise<T> {
+export async function validateAsync<Output, Input = unknown>(
+  schema: z.ZodType<Output, z.ZodTypeDef, Input>,
+  data: unknown
+): Promise<Output> {
   return schema.parseAsync(data);
 }
 
 /**
  * Create a validator function from a schema
  */
-export function createValidator<T>(schema: z.ZodSchema<T>) {
+export function createValidator<Output, Input = unknown>(
+  schema: z.ZodType<Output, z.ZodTypeDef, Input>
+) {
   return {
-    validate: (data: unknown): T => validate(schema, data),
-    validateSafe: (data: unknown): ValidationResult<T> => validateSafe(schema, data),
-    validateAsync: (data: unknown): Promise<T> => validateAsync(schema, data),
+    validate: (data: unknown): Output => validate(schema, data),
+    validateSafe: (data: unknown): ValidationResult<Output> => validateSafe(schema, data),
+    validateAsync: (data: unknown): Promise<Output> => validateAsync(schema, data),
     schema,
   };
 }

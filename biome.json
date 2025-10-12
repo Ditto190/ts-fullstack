@@ -66,11 +66,12 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx"],
+      "includes": ["**/*.test.ts", "**/*.test.tsx", "**/*.spec.ts", "**/*.spec.tsx", "**/*.integration.test.ts"],
       "linter": {
         "rules": {
           "suspicious": {
-            "noExplicitAny": "off"
+            "noExplicitAny": "off",
+            "noConsole": "off"
           }
         }
       }
@@ -104,6 +105,16 @@
         "rules": {
           "suspicious": {
             "noRedeclare": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/routeTree.gen.ts", "**/*.gen.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
           }
         }
       }

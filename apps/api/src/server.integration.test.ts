@@ -1,6 +1,6 @@
-import { afterAll, beforeAll, describe, expect, it } from 'vitest';
+import { SecretKeys, secretManager } from '@adaptiveworx/shared';
 import type { FastifyInstance } from 'fastify';
-import { secretManager, SecretKeys } from '@adaptiveworx/shared';
+import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 let skipReason: string | null = null;
 let server: FastifyInstance | null = null;
@@ -13,6 +13,7 @@ async function resolveDatabaseUrl(): Promise<string | undefined> {
   try {
     return await secretManager.getSecretAsync(SecretKeys.DATABASE_URL);
   } catch (error) {
+    // biome-ignore lint/suspicious/noConsole: Integration test helper logging
     console.warn('Failed to resolve DATABASE_URL via Infisical:', error);
     return undefined;
   }
@@ -44,6 +45,7 @@ describe('API server integration (requires DATABASE_URL)', () => {
   it('responds to /health using real database connection', async (context) => {
     if (skipReason !== null || server === null) {
       context.skip(skipReason ?? 'Skipping integration test');
+      return;
     }
 
     const response = await server.inject({ method: 'GET', url: '/health' });

@@ -52,8 +52,8 @@ describe('statusReportWorkflow', () => {
   });
 
   it('throws when using unsupported tool override', async () => {
-    await expect(
-      statusReportWorkflow({}, { tool: 'nonexistent' as never })
-    ).rejects.toThrowError(/not configured/);
+    await expect(statusReportWorkflow({}, { tool: 'nonexistent' as never })).rejects.toThrowError(
+      /not configured/
+    );
   });
 });

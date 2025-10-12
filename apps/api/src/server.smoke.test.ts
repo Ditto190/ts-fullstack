@@ -1,5 +1,5 @@
-import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import type { FastifyInstance } from 'fastify';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { buildServer } from './server.js';
 
 type UserRecord = {
@@ -219,7 +219,7 @@ describe('API server smoke tests', () => {
         id: string;
         email: string;
         name: string | null;
-        _count: { posts: number };
+        postsCount: number;
       }>;
     };
 
@@ -229,12 +229,12 @@ describe('API server smoke tests', () => {
         expect.objectContaining({
           id: 'user-1',
           email: 'alice@example.com',
-          _count: { posts: 2 },
+          postsCount: 2,
         }),
         expect.objectContaining({
           id: 'user-2',
           email: 'bob@example.com',
-          _count: { posts: 1 },
+          postsCount: 1,
         }),
       ])
     );

@@ -1,2 +1,11 @@
-export { SecretManager, secretManager, SecretKeys, type SecretKey } from './secrets.js';
-export { InfisicalManager, infisical, type InfisicalConfig, type SecretMetadata, type CreateSecretOptions, type UpdateSecretOptions, type DeleteSecretOptions, type ListSecretsOptions } from './infisical.js';
+export {
+  type CreateSecretOptions,
+  type DeleteSecretOptions,
+  type InfisicalConfig,
+  InfisicalManager,
+  infisical,
+  type ListSecretsOptions,
+  type SecretMetadata,
+  type UpdateSecretOptions,
+} from './infisical.js';
+export { type SecretKey, SecretKeys, SecretManager, secretManager } from './secrets.js';

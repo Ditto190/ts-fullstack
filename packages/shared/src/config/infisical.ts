@@ -17,13 +17,13 @@
 
 import {
   InfisicalSDK,
-  type Secret,
-  type ListSecretsOptions as SDKListSecretsOptions,
-  type GetSecretOptions as SDKGetSecretOptions,
   type CreateSecretOptions as SDKCreateSecretOptions,
-  type UpdateSecretOptions as SDKUpdateSecretOptions,
   type DeleteSecretOptions as SDKDeleteSecretOptions,
-  SecretType
+  type GetSecretOptions as SDKGetSecretOptions,
+  type ListSecretsOptions as SDKListSecretsOptions,
+  type UpdateSecretOptions as SDKUpdateSecretOptions,
+  type Secret,
+  SecretType,
 } from '@infisical/sdk';
 
 export interface InfisicalConfig {
@@ -33,8 +33,8 @@ export interface InfisicalConfig {
   siteUrl?: string | undefined;
 
   // Application secret hierarchy
-  appProjectId?: string | undefined;      // App-specific secrets (highest priority, optional)
-  appsProjectId?: string | undefined;     // Shared app secrets (default for all apps)
+  appProjectId?: string | undefined; // App-specific secrets (highest priority, optional)
+  appsProjectId?: string | undefined; // Shared app secrets (default for all apps)
 
   // Infrastructure/platform secrets (separate from app hierarchy)
   platformProjectId?: string | undefined; // Platform secrets (AWS, monitoring, etc.)
@@ -44,12 +44,12 @@ export interface InfisicalConfig {
   projectSlug?: string | undefined;
 
   // Cache settings
-  cacheTTL?: number | undefined;         // Cache TTL in milliseconds (default: 5 minutes)
-  enableCache?: boolean | undefined;      // Enable caching (default: true)
+  cacheTTL?: number | undefined; // Cache TTL in milliseconds (default: 5 minutes)
+  enableCache?: boolean | undefined; // Enable caching (default: true)
 
   // Retry settings
-  maxRetries?: number | undefined;        // Max retry attempts (default: 3)
-  retryDelay?: number | undefined;        // Delay between retries in ms (default: 1000)
+  maxRetries?: number | undefined; // Max retry attempts (default: 3)
+  retryDelay?: number | undefined; // Delay between retries in ms (default: 1000)
 }
 
 export interface CachedSecret {
@@ -142,6 +142,14 @@ export class InfisicalManager {
     this.initPromise = null;
   }
 
+  private assertSDK(): void {
+    if (!this.sdk) {
+      throw new Error(
+        'Infisical SDK not initialized. Provide INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET.'
+      );
+    }
+  }
+
   private async _initialize(): Promise<void> {
     try {
       // Skip initialization if no credentials
@@ -168,7 +176,9 @@ export class InfisicalManager {
       this.isInitialized = true;
     } catch (error) {
       // Re-throw with more context
-      throw new Error(`Infisical SDK initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Infisical SDK initialization failed: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   }
 
@@ -176,7 +186,10 @@ export class InfisicalManager {
    * Get a secret with hierarchical resolution
    * Tries: app-specific -> apps shared -> platform -> environment variable
    */
-  async getSecret(key: string, options?: { projectId?: string; path?: string; noCache?: boolean }): Promise<string | undefined> {
+  async getSecret(
+    key: string,
+    options?: { projectId?: string; path?: string; noCache?: boolean }
+  ): Promise<string | undefined> {
     await this.initialize();
 
     // Check cache first
@@ -193,7 +206,7 @@ export class InfisicalManager {
     // Try hierarchical resolution (app-specific -> worx-apps)
     const projectIds = options?.projectId
       ? [options.projectId]
-      : [this.config.appProjectId, this.config.appsProjectId].filter(Boolean) as string[];
+      : ([this.config.appProjectId, this.config.appsProjectId].filter(Boolean) as string[]);
 
     for (const projectId of projectIds) {
       try {
@@ -202,7 +215,7 @@ export class InfisicalManager {
           this.cacheSecret(key, value);
           return value;
         }
-      } catch (error) {
+      } catch {
         // Continue to next project in hierarchy
         // Secret not found in this project, try next
       }
@@ -215,12 +228,15 @@ export class InfisicalManager {
   /**
    * Get a required secret (throws if not found)
    */
-  async getRequiredSecret(key: string, options?: { projectId?: string; path?: string }): Promise<string> {
+  async getRequiredSecret(
+    key: string,
+    options?: { projectId?: string; path?: string }
+  ): Promise<string> {
     const value = await this.getSecret(key, options);
     if (!value) {
       throw new Error(
         `Required secret '${key}' not found. ` +
-        `Checked: Infisical projects (${[this.config.appProjectId, this.config.appsProjectId].filter(Boolean).join(', ')}) and environment variables.`
+          `Checked: Infisical projects (${[this.config.appProjectId, this.config.appsProjectId].filter(Boolean).join(', ')}) and environment variables.`
       );
     }
     return value;
@@ -238,14 +254,17 @@ export class InfisicalManager {
 
     return this.getSecret(key, {
       projectId: this.config.platformProjectId,
-      ...(options?.path && { path: options.path })
+      ...(options?.path && { path: options.path }),
     });
   }
 
   /**
    * Get multiple secrets at once
    */
-  async getSecrets(keys: string[], options?: { projectId?: string; path?: string }): Promise<Record<string, string | undefined>> {
+  async getSecrets(
+    keys: string[],
+    options?: { projectId?: string; path?: string }
+  ): Promise<Record<string, string | undefined>> {
     const results: Record<string, string | undefined> = {};
 
     // Fetch in parallel for better performance
@@ -265,7 +284,9 @@ export class InfisicalManager {
     await this.initialize();
 
     if (!this.sdk) {
-      throw new Error('Infisical SDK not initialized. Provide INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET.');
+      throw new Error(
+        'Infisical SDK not initialized. Provide INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET.'
+      );
     }
 
     const projectId = options.projectId || this.config.appProjectId || this.config.appsProjectId;
@@ -273,6 +294,7 @@ export class InfisicalManager {
       throw new Error('No project ID specified for secret creation');
     }
 
+    this.assertSDK();
     await this.retryOperation(async () => {
       const createOptions: SDKCreateSecretOptions = {
         projectId,
@@ -283,6 +305,7 @@ export class InfisicalManager {
         ...(options.comment && { secretComment: options.comment }),
       };
 
+      // biome-ignore lint/style/noNonNullAssertion: SDK existence checked by assertSDK()
       await this.sdk!.secrets().createSecret(options.key, createOptions);
     });
 
@@ -297,7 +320,9 @@ export class InfisicalManager {
     await this.initialize();
 
     if (!this.sdk) {
-      throw new Error('Infisical SDK not initialized. Provide INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET.');
+      throw new Error(
+        'Infisical SDK not initialized. Provide INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET.'
+      );
     }
 
     const projectId = options.projectId || this.config.appProjectId || this.config.appsProjectId;
@@ -305,6 +330,7 @@ export class InfisicalManager {
       throw new Error('No project ID specified for secret update');
     }
 
+    this.assertSDK();
     await this.retryOperation(async () => {
       const updateOptions: SDKUpdateSecretOptions = {
         projectId,
@@ -312,9 +338,12 @@ export class InfisicalManager {
         secretPath: options.path || '/',
         secretValue: options.value,
         type: SecretType.Shared,
-        ...(options.skipMultilineEncoding !== undefined && { skipMultilineEncoding: options.skipMultilineEncoding }),
+        ...(options.skipMultilineEncoding !== undefined && {
+          skipMultilineEncoding: options.skipMultilineEncoding,
+        }),
       };
 
+      // biome-ignore lint/style/noNonNullAssertion: SDK existence checked by assertSDK()
       await this.sdk!.secrets().updateSecret(options.key, updateOptions);
     });
 
@@ -328,9 +357,7 @@ export class InfisicalManager {
   async deleteSecret(options: DeleteSecretOptions): Promise<void> {
     await this.initialize();
 
-    if (!this.sdk) {
-      throw new Error('Infisical SDK not initialized. Provide INFISICAL_CLIENT_ID and INFISICAL_CLIENT_SECRET.');
-    }
+    this.assertSDK();
 
     const projectId = options.projectId || this.config.appProjectId || this.config.appsProjectId;
     if (!projectId) {
@@ -345,6 +372,7 @@ export class InfisicalManager {
         type: SecretType.Shared,
       };
 
+      // biome-ignore lint/style/noNonNullAssertion: SDK existence checked by assertSDK()
       await this.sdk!.secrets().deleteSecret(options.key, deleteOptions);
     });
 
@@ -360,7 +388,7 @@ export class InfisicalManager {
 
     if (!this.sdk) {
       // Return env vars if no SDK
-      return Object.keys(process.env).map(key => ({
+      return Object.keys(process.env).map((key) => ({
         key,
         value: process.env[key] || '',
         type: 'shared' as const,
@@ -369,6 +397,8 @@ export class InfisicalManager {
         updatedAt: new Date(),
       }));
     }
+
+    this.assertSDK();
 
     const projectId = options?.projectId || this.config.appProjectId || this.config.appsProjectId;
     if (!projectId) {
@@ -384,6 +414,7 @@ export class InfisicalManager {
     };
 
     const response = await this.retryOperation(async () => {
+      // biome-ignore lint/style/noNonNullAssertion: SDK existence checked by assertSDK()
       return await this.sdk!.secrets().listSecrets(listOptions);
     });
 
@@ -407,7 +438,7 @@ export class InfisicalManager {
     this.cache.clear();
 
     // Re-fetch all previously cached secrets
-    await Promise.all(keys.map(key => this.getSecret(key)));
+    await Promise.all(keys.map((key) => this.getSecret(key)));
   }
 
   /**
@@ -429,7 +460,12 @@ export class InfisicalManager {
 
   // Private helper methods
 
-  private async fetchSecretWithRetry(key: string, projectId: string, path?: string): Promise<string | undefined> {
+  private async fetchSecretWithRetry(
+    key: string,
+    projectId: string,
+    path?: string
+  ): Promise<string | undefined> {
+    this.assertSDK();
     return this.retryOperation(async () => {
       const options: SDKGetSecretOptions = {
         projectId,
@@ -439,6 +475,7 @@ export class InfisicalManager {
         type: SecretType.Shared,
       };
 
+      // biome-ignore lint/style/noNonNullAssertion: SDK existence checked by assertSDK()
       const secret = await this.sdk!.secrets().getSecret(options);
       return secret.secretValue;
     });
@@ -463,7 +500,7 @@ export class InfisicalManager {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   private getCachedSecret(key: string): string | undefined {

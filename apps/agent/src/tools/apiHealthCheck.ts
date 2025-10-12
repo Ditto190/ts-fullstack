@@ -1,10 +1,7 @@
 import { z } from 'zod';
 
 export const ApiHealthCheckInputSchema = z.object({
-  baseUrl: z
-    .string()
-    .url()
-    .default('http://localhost:3000'),
+  baseUrl: z.string().url().default('http://localhost:3000'),
   timeoutMs: z.number().int().positive().max(30_000).default(5_000),
 });
 
@@ -61,7 +58,7 @@ export async function apiHealthCheck(input: ApiHealthCheckInput): Promise<ApiHea
     const message =
       error instanceof Error && error.name === 'AbortError'
         ? 'Request timed out'
-        : (error as Error).message ?? 'Unknown error';
+        : ((error as Error).message ?? 'Unknown error');
 
     return {
       service: 'api',

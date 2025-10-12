@@ -1,6 +1,6 @@
 import { Button } from '@adaptiveworx/ui';
 import { createLazyFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useCreatePost, useDeletePost, usePosts, useUsers } from '../lib/api-hooks.js';
 
 export const Route = createLazyFileRoute('/posts')({
@@ -14,6 +14,9 @@ function PostsPage() {
   const deletePostMutation = useDeletePost();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({ title: '', content: '', authorId: '' });
+  const authorId = useId();
+  const titleId = useId();
+  const contentId = useId();
 
   const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -64,11 +67,11 @@ function PostsPage() {
             <h3 className="text-lg font-medium text-gray-900">Create New Post</h3>
             <form onSubmit={handleCreatePost} className="mt-5 space-y-4">
               <div>
-                <label htmlFor="authorId" className="block text-sm font-medium text-gray-700">
+                <label htmlFor={authorId} className="block text-sm font-medium text-gray-700">
                   Author
                 </label>
                 <select
-                  id="authorId"
+                  id={authorId}
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.authorId}
@@ -83,12 +86,12 @@ function PostsPage() {
                 </select>
               </div>
               <div>
-                <label htmlFor="title" className="block text-sm font-medium text-gray-700">
+                <label htmlFor={titleId} className="block text-sm font-medium text-gray-700">
                   Title
                 </label>
                 <input
                   type="text"
-                  id="title"
+                  id={titleId}
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.title}
@@ -96,11 +99,11 @@ function PostsPage() {
                 />
               </div>
               <div>
-                <label htmlFor="content" className="block text-sm font-medium text-gray-700">
+                <label htmlFor={contentId} className="block text-sm font-medium text-gray-700">
                   Content (optional)
                 </label>
                 <textarea
-                  id="content"
+                  id={contentId}
                   rows={4}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.content}
@@ -140,6 +143,7 @@ function PostsPage() {
                   <span>{new Date(post.createdAt).toLocaleDateString()}</span>
                 </div>
                 <button
+                  type="button"
                   onClick={() => handleDeletePost(post.id)}
                   disabled={deletePostMutation.isPending}
                   className="text-sm text-red-600 hover:text-red-900 disabled:opacity-50"

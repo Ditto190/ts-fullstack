@@ -9,11 +9,11 @@ describe('SecretManager', () => {
   beforeEach(() => {
     // Clear environment variables
     vi.resetModules();
-    Object.keys(process.env).forEach(key => {
+    for (const key of Object.keys(process.env)) {
       if (key.includes('TEST') || key.includes('SECRET')) {
         delete process.env[key];
       }
-    });
+    }
 
     // Create mock Infisical manager
     mockInfisicalManager = {
@@ -99,9 +99,9 @@ describe('SecretManager', () => {
     it('getSecretAsync should throw when required and missing', async () => {
       vi.mocked(mockInfisicalManager.getSecret!).mockResolvedValue(undefined);
 
-      await expect(
-        secretManager.getSecretAsync('MISSING', { required: true })
-      ).rejects.toThrow("Required secret 'MISSING' not found");
+      await expect(secretManager.getSecretAsync('MISSING', { required: true })).rejects.toThrow(
+        "Required secret 'MISSING' not found"
+      );
     });
 
     it('getRequiredSecret should delegate to Infisical manager', async () => {
@@ -109,7 +109,10 @@ describe('SecretManager', () => {
 
       const result = await secretManager.getRequiredSecret('REQUIRED_KEY');
 
-      expect(mockInfisicalManager.getRequiredSecret).toHaveBeenCalledWith('REQUIRED_KEY', undefined);
+      expect(mockInfisicalManager.getRequiredSecret).toHaveBeenCalledWith(
+        'REQUIRED_KEY',
+        undefined
+      );
       expect(result).toBe('required-value');
     });
 
@@ -122,7 +125,10 @@ describe('SecretManager', () => {
 
       const result = await secretManager.getSecrets(['KEY1', 'KEY2', 'KEY3']);
 
-      expect(mockInfisicalManager.getSecrets).toHaveBeenCalledWith(['KEY1', 'KEY2', 'KEY3'], undefined);
+      expect(mockInfisicalManager.getSecrets).toHaveBeenCalledWith(
+        ['KEY1', 'KEY2', 'KEY3'],
+        undefined
+      );
       expect(result).toEqual({
         KEY1: 'value1',
         KEY2: 'value2',
@@ -188,26 +194,28 @@ describe('SecretManager', () => {
     });
 
     it('should list secrets', async () => {
+      const date1 = new Date();
+      const date2 = new Date();
       const mockSecrets = [
         {
           key: 'KEY1',
           value: 'value1',
           type: 'shared' as const,
           version: 1,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: date1,
+          updatedAt: date1,
           tags: undefined,
-          comment: undefined
+          comment: undefined,
         },
         {
           key: 'KEY2',
           value: 'value2',
           type: 'personal' as const,
           version: 1,
-          createdAt: new Date(),
-          updatedAt: new Date(),
+          createdAt: date2,
+          updatedAt: date2,
           tags: undefined,
-          comment: undefined
+          comment: undefined,
         },
       ];
 
@@ -220,7 +228,7 @@ describe('SecretManager', () => {
       expect(result[0]).toEqual({
         key: 'KEY1',
         value: 'value1',
-        updatedAt: mockSecrets[0].updatedAt,
+        updatedAt: date1,
       });
     });
   });

@@ -1,5 +1,6 @@
+import type { UserWithCounts } from '@adaptiveworx/db';
 import { describe, expect, it } from 'vitest';
-import { mapUserWithCounts, type UserWithCounts } from './users.helpers.js';
+import { mapUserWithCounts } from './users.helpers.js';
 
 describe('mapUserWithCounts', () => {
   const baseRow = {
@@ -20,9 +21,7 @@ describe('mapUserWithCounts', () => {
       name: 'Example User',
       createdAt: new Date('2024-01-01T00:00:00Z'),
       updatedAt: new Date('2024-01-02T00:00:00Z'),
-      _count: {
-        posts: 3,
-      },
+      postsCount: 3,
     };
 
     expect(result).toEqual(expected);
@@ -31,7 +30,7 @@ describe('mapUserWithCounts', () => {
   it('defaults missing post counts to zero', () => {
     const result = mapUserWithCounts({ ...baseRow, postsCount: null });
 
-    expect(result._count.posts).toBe(0);
+    expect(result.postsCount).toBe(0);
   });
 
   it('supports users without a name', () => {

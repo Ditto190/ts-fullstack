@@ -2,10 +2,8 @@ import { db, insertPostSchema, posts, users } from '@adaptiveworx/db';
 import { validateBody } from '@adaptiveworx/shared/validation-middleware';
 import { desc, eq } from 'drizzle-orm';
 import type { FastifyPluginAsync } from 'fastify';
-import {
-  mapPostWithAuthor,
-  type PostWithAuthor,
-} from './posts.helpers.js';
+import { mapPostWithAuthor, type PostWithAuthor } from './posts.helpers.js';
+
 export type { AuthorSummary, PostQueryResult, PostWithAuthor } from './posts.helpers.js';
 
 async function fetchPostById(id: string): Promise<PostWithAuthor | null> {

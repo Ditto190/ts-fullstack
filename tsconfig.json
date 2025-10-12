@@ -1,19 +1,6 @@
 {
   "extends": "@tsconfig/strictest/tsconfig.json",
   "compilerOptions": {
-    "target": "ES2022",
-    "module": "NodeNext",
-    "lib": ["ES2024"],
-    "moduleResolution": "NodeNext",
-    "outDir": "./dist",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "removeComments": false,
-    "composite": true,
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-
     "baseUrl": ".",
     "paths": {
       "@adaptiveworx/db": ["packages/db/src"],
@@ -26,6 +13,7 @@
       "@adaptiveworx/agent/*": ["apps/agent/src/*"]
     }
   },
+  "files": [],
   "references": [
     { "path": "./packages/db" },
     { "path": "./packages/shared" },

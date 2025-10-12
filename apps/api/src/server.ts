@@ -23,9 +23,7 @@ function createDefaultLogger(): FastifyServerOptions['logger'] {
   return true;
 }
 
-export async function buildServer(
-  options: FastifyServerOptions = {}
-): Promise<FastifyInstance> {
+export async function buildServer(options: FastifyServerOptions = {}): Promise<FastifyInstance> {
   // Build server options, ensuring logger is always defined
   const serverOptions = {
     ...options,

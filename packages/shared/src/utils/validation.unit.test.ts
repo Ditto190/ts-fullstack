@@ -11,7 +11,7 @@ import {
   StringToNumber,
   validate,
   validateSafe,
-} from './validation';
+} from './validation.js';
 
 describe('validation utilities', () => {
   describe('validateSafe', () => {

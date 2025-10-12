@@ -1,8 +1,8 @@
-import { z } from 'zod';
+import type { z } from 'zod';
 import {
   ApiHealthCheckInputSchema,
-  apiHealthCheck,
   type ApiHealthCheckResult,
+  apiHealthCheck,
 } from './apiHealthCheck.js';
 
 export interface ToolDefinition<TSchema extends z.ZodTypeAny, TResult> {
@@ -45,6 +45,6 @@ export async function executeTool<TName extends ToolName>(
 
   const parsed = tool.schema.parse(input ?? {});
 
-  // Type assertion needed due to complex generic constraints
-  return tool.execute(parsed) as any;
+  const result = await tool.execute(parsed);
+  return result as Awaited<ReturnType<ToolRegistry[TName]['execute']>>;
 }

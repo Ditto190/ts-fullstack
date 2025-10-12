@@ -1,6 +1,6 @@
 import { Button } from '@adaptiveworx/ui';
 import { createLazyFileRoute } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { useCreateUser, useDeleteUser, useUsers } from '../lib/api-hooks.js';
 
 export const Route = createLazyFileRoute('/users')({
@@ -13,6 +13,8 @@ function UsersPage() {
   const deleteUserMutation = useDeleteUser();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState({ email: '', name: '' });
+  const emailId = useId();
+  const nameId = useId();
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -63,12 +65,12 @@ function UsersPage() {
             <h3 className="text-lg font-medium text-gray-900">Create New User</h3>
             <form onSubmit={handleCreateUser} className="mt-5 space-y-4">
               <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+                <label htmlFor={emailId} className="block text-sm font-medium text-gray-700">
                   Email
                 </label>
                 <input
                   type="email"
-                  id="email"
+                  id={emailId}
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.email}
@@ -76,12 +78,12 @@ function UsersPage() {
                 />
               </div>
               <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                <label htmlFor={nameId} className="block text-sm font-medium text-gray-700">
                   Name (optional)
                 </label>
                 <input
                   type="text"
-                  id="name"
+                  id={nameId}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
@@ -126,9 +128,7 @@ function UsersPage() {
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
                   {user.name || '—'}
                 </td>
-                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
-                  {user.email}
-                </td>
+                <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">{user.email}</td>
                 <td className="whitespace-nowrap px-6 py-4 text-sm text-gray-900">
                   {user.postsCount}
                 </td>
@@ -137,6 +137,7 @@ function UsersPage() {
                 </td>
                 <td className="relative whitespace-nowrap py-4 pl-3 pr-6 text-right text-sm font-medium">
                   <button
+                    type="button"
                     onClick={() => handleDeleteUser(user.id)}
                     disabled={deleteUserMutation.isPending}
                     className="text-red-600 hover:text-red-900 disabled:opacity-50"
