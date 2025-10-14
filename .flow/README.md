@@ -132,6 +132,19 @@ yarn vh:summary    # Auto-computes views/stats, generates dashboard
 ✓ Score every VH with impact/confidence/effort/urgency
 ✓ Let test results determine behavior status (DONE = all passing)
 
+## 🔄 Git Hooks (Automatic)
+
+The pre-commit hook (`.husky/pre-commit`) automatically runs on every commit:
+
+1. **Sync behaviors** - `yarn behaviors:sync` (scans test files → behaviors.json)
+2. **Validate behaviors** - `yarn behaviors:validate` (checks taxonomy, dependencies)
+3. **Type check** - `yarn type-check` (TypeScript compilation)
+4. **Lint** - `yarn lint:check` (Biome checks)
+5. **Test** - `yarn test` (Vitest runs all tests)
+6. **Generate dashboards** - `yarn behaviors:summary` + `yarn vh:summary`
+
+**Note:** Generated files (behaviors.json, *.md dashboards) are in .gitignore and NOT committed. They're regenerated on each commit to ensure consistency but remain local artifacts.
+
 ## 📊 Value Hypothesis Scoring
 
 **Value-driven prioritization:**
