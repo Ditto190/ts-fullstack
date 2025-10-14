@@ -39,9 +39,9 @@
  * - [x] TypeScript types inferred from schema
  */
 
-import { describe, it, expect } from 'vitest';
-import { users, insertUserSchema } from './users.js';
-import type { User, NewUser } from './users.js';
+import { describe, expect, it } from 'vitest';
+import type { NewUser } from './users.js';
+import { insertUserSchema, users } from './users.js';
 
 describe('DB.SCHEMA.USERS', () => {
   describe('Given: Application needs to store user data', () => {

@@ -38,8 +38,8 @@
  * - [x] Button accepts className for custom styling
  */
 
-import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
 import { Button } from './button.js';
 
 describe('UI.COMPONENT.BUTTON', () => {

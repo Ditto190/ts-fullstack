@@ -10,6 +10,7 @@
     "envs/*"
   ],
   "scripts": {
+    "prepare": "husky",
     "dev": "turbo run dev --parallel",
     "dev:api": "yarn workspace @adaptiveworx/api dev",
     "dev:web": "yarn workspace @adaptiveworx/web dev",

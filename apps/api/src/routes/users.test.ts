@@ -40,7 +40,7 @@
  * - [ ] Returns 409 for duplicate email
  */
 
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, expect, it } from 'vitest';
 
 describe('API.ROUTE.USER.CREATE', () => {
   describe('Given: Client sends POST /api/users with valid user data', () => {

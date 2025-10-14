@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Prevent commits with failing validation
 echo "Running pre-commit validation..."
 
