@@ -1,17 +1,34 @@
 #!/usr/bin/env tsx
+
 /**
  * Behavior Sync Script
  *
- * Scans the codebase for @behavior headers and generates behaviors.json registry.
+ * Scans test files for @behavior headers and generates behaviors.json registry.
+ * Computes behavior status from vitest results (test-results/results.json).
  *
  * Key Concepts:
  * - behaviors.json = Complete registry of ALL behaviors
- * - Backlog = View into behaviors.json filtered by status: PLANNED
- * - Code is source of truth: @behavior headers in code drive the registry
+ * - Status computed from tests: all passing → DONE, some failing → IN_PROGRESS, none passing → PLANNED
+ * - Test files are source of truth: @behavior headers in *.test.ts files drive the registry
+ * - NO @status field in headers (computed automatically)
  */
 
+import { existsSync } from 'node:fs';
 import { readdir, readFile, writeFile } from 'node:fs/promises';
 import { join, relative } from 'node:path';
+
+interface VitestResults {
+  testResults: Array<{
+    name: string;
+    status: 'passed' | 'failed';
+    assertionResults: Array<{
+      ancestorTitles: Array<string>;
+      fullName: string;
+      status: 'passed' | 'failed';
+      title: string;
+    }>;
+  }>;
+}
 
 interface BehaviorHeader {
   id: string;
@@ -448,15 +465,82 @@ function calculateStats(
 }
 
 /**
+ * Load vitest results and compute behavior status
+ * Status logic:
+ * - DONE: All tests for this behavior passing
+ * - IN_PROGRESS: Some tests passing, some failing
+ * - PLANNED: All tests failing or no tests found
+ */
+async function loadTestResults(): Promise<Map<string, 'DONE' | 'IN_PROGRESS' | 'PLANNED'>> {
+  const statusMap = new Map<string, 'DONE' | 'IN_PROGRESS' | 'PLANNED'>();
+  const testResultsPath = join(process.cwd(), 'test-results', 'results.json');
+
+  if (!existsSync(testResultsPath)) {
+    console.log(
+      '⚠️  No test results found (run `yarn test` first). All behaviors default to PLANNED.'
+    );
+    return statusMap;
+  }
+
+  try {
+    const resultsContent = await readFile(testResultsPath, 'utf-8');
+    const results: VitestResults = JSON.parse(resultsContent);
+
+    // Map: behavior ID → { passing: number, failing: number }
+    const behaviorTests = new Map<string, { passing: number; failing: number }>();
+
+    for (const testFile of results.testResults) {
+      for (const assertion of testFile.assertionResults) {
+        // Behavior ID is the first ancestor title (describe block)
+        const behaviorId = assertion.ancestorTitles[0];
+        if (!behaviorId) continue;
+
+        const counts = behaviorTests.get(behaviorId) || { passing: 0, failing: 0 };
+        if (assertion.status === 'passed') {
+          counts.passing++;
+        } else {
+          counts.failing++;
+        }
+        behaviorTests.set(behaviorId, counts);
+      }
+    }
+
+    // Compute status for each behavior
+    for (const [behaviorId, counts] of behaviorTests.entries()) {
+      if (counts.failing === 0 && counts.passing > 0) {
+        statusMap.set(behaviorId, 'DONE');
+      } else if (counts.passing > 0 && counts.failing > 0) {
+        statusMap.set(behaviorId, 'IN_PROGRESS');
+      } else {
+        statusMap.set(behaviorId, 'PLANNED');
+      }
+    }
+
+    return statusMap;
+  } catch (error) {
+    console.error('⚠️  Error loading test results:', error);
+    return statusMap;
+  }
+}
+
+/**
  * Build behavior registry from parsed headers
  */
-function buildRegistry(headers: Array<BehaviorHeader>): BehaviorRegistry {
+async function buildRegistry(
+  headers: Array<BehaviorHeader>,
+  testStatusMap: Map<string, 'DONE' | 'IN_PROGRESS' | 'PLANNED'>
+): Promise<BehaviorRegistry> {
   const behaviors: BehaviorRegistry['behaviors'] = {};
 
   // Build behaviors from headers
   for (const header of headers) {
     if (!behaviors[header.id]) {
       behaviors[header.id] = createBehaviorFromHeader(header);
+    }
+    // Override status with computed value from tests
+    const computedStatus = testStatusMap.get(header.id);
+    if (computedStatus) {
+      behaviors[header.id].status = computedStatus;
     }
     mergeBehaviorData(behaviors[header.id], header);
   }
@@ -525,8 +609,12 @@ async function main(): Promise<void> {
     process.exit(0);
   }
 
+  // Load test results and compute status from vitest
+  console.log('\n🧪 Computing behavior status from test results...\n');
+  const testStatusMap = await loadTestResults();
+
   // Build registry
-  const registry = buildRegistry(allHeaders);
+  const registry = await buildRegistry(allHeaders, testStatusMap);
 
   // Write behaviors.json
   const registryPath = join(WORKSPACE_ROOT, 'behaviors.json');
