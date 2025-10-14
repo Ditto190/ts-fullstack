@@ -14,36 +14,44 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### The 6-Step Process
 1. **Collaborate on Objectives** - Discuss and agree on features to build
-2. **Define Feature IDs** - Create semantic taxonomy IDs (e.g., `TASK.ITEM.CREATE`, `TEAM.MEMBER.INVITE`) - see [docs/FEATURE-TAXONOMY.md](docs/FEATURE-TAXONOMY.md)
+2. **Define Behavior IDs** - Create semantic taxonomy IDs (e.g., `USER.ROUTE.CREATE`, `API.AUTH.MIDDLEWARE`) - see [.flow/README.md](.flow/README.md)
 3. **Agree on Architecture** - Decide on packages (api, web, agent, shared, ui, db) and dependencies
-4. **Claude Handles Dev/Test** - Claude writes/tests TypeScript code and ensures 100% clean code:
-   - Add **@feature headers** to every implementation (source of truth)
-   - Recommend tests (unit, integration, e2e) - co-locate with code
-   - Write code across packages with explicit dependencies
-   - Run `yarn feature:validate` - Check taxonomy, dependencies, circular deps
-   - Run `yarn feature:sync` - Generate features.json from code
+4. **Claude Handles Dev/Test** - Claude writes/tests TypeScript code using TDD and ensures 100% clean code:
+   - Add **@behavior headers** to TEST files (source of truth)
+   - Write tests FIRST with Given-When-Then structure
+   - Implement to make tests pass
+   - Co-locate tests with code (*.test.ts next to *.ts)
+   - Run `yarn behaviors:sync` - Generate behaviors.json from test files
+   - Run `yarn behaviors:validate` - Check taxonomy, dependencies
    - Run `yarn build` - Fix ALL compilation errors
    - Run `yarn lint:check` - Fix ALL linter errors/warnings
    - Run `yarn test` - Fix ALL failing tests
-   - **Deliver 100% clean code** - No errors, no warnings, all tests pass, features documented
+   - Run `yarn behaviors:summary` - Generate dashboards
+   - **Deliver 100% clean code** - No errors, no warnings, all tests pass, behaviors documented
 5. **User Handles Deployment** - User manages Docker, database migrations, environment promotion
-6. **Review Together** - Review integration, API contracts, UI components, feature registry
+6. **Review Together** - Review integration, API contracts, UI components, behavior registry
 
 ### What Claude MUST Do
-- Add **@feature header** to every implementation (mandatory)
-- Run `yarn feature:validate && yarn feature:sync` before build
+- Add **@behavior headers** to TEST files only (never in implementation files)
+- Follow TDD workflow: Write failing tests → Implement → Tests pass → Sync
+- Run `yarn behaviors:sync` after creating/updating @behavior headers
 - Co-locate tests with code (*.test.ts next to *.ts)
-- Declare explicit feature dependencies in @feature headers
+- Declare explicit behavior dependencies in @behavior headers
+- Use semantic taxonomy: DOMAIN.ENTITY.OPERATION (defined in `.flow/taxonomy.yaml`)
 - Fix ALL errors/warnings - deliver 100% clean code
 - Use shared packages (@adaptiveworx/ui, @adaptiveworx/shared)
+- Update Value Hypotheses in `.flow/value-hypotheses.json` when starting new features
 
 ### What Claude Must NOT Do
-- Skip @feature headers ("I'll add them later")
-- Create features without taxonomy discussion
+- Skip @behavior headers ("I'll add them later")
+- Put @behavior headers in implementation files (they belong in TEST files only)
+- Manually edit behaviors.json or dashboard .md files (they're auto-generated)
+- Create behaviors without taxonomy discussion
 - Run Docker commands (user handles infrastructure)
 - Run database migrations in production
 - Leave ANY errors, warnings, or failing tests
 - Modify envs/*/package.json versions without approval
+- Use arbitrary IDs like "FEATURE-1" (use semantic taxonomy)
 
 ## Monorepo Structure
 
@@ -280,19 +288,46 @@ export async function userRoutes(server: FastifyInstance) {
 }
 \`\`\`
 
-### Testing Pattern
-Co-locate tests with source files:
+### Testing Pattern with @behavior Headers
+Co-locate tests with source files and use @behavior headers:
 
 \`\`\`typescript
 // packages/ui/src/components/button/Button.test.tsx
+/**
+ * @behavior UI.COMPONENT.BUTTON
+ * @priority HIGH
+ * @effort SMALL
+ * @theme EXPERIENCE
+ * @persona DEVELOPER
+ * @layer UI
+ *
+ * @why
+ * Provide reusable Button component for consistent UI interactions
+ *
+ * @who
+ * As a frontend developer, I want a reusable Button component
+ * so that I can build consistent UIs quickly
+ *
+ * @what
+ * Given: Developer needs to render a button
+ * When: They import and use <Button> component
+ * Then: Button renders with correct styles and accessibility
+ *
+ * @acceptance
+ * - [x] Button renders with default variant
+ * - [x] Button supports size variants
+ * - [x] Button is accessible
+ */
 import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { Button } from './Button.js';
 
-describe('Button', () => {
-  it('renders with correct text', () => {
-    render(<Button>Click me</Button>);
-    expect(screen.getByText('Click me')).toBeInTheDocument();
+describe('UI.COMPONENT.BUTTON', () => {
+  describe('Given: Developer needs to render a button', () => {
+    it('When: Default props used, Then: Button renders correctly', () => {
+      render(<Button>Click me</Button>);
+      expect(screen.getByText('Click me')).toBeInTheDocument();
+    });
   });
 });
 \`\`\`
@@ -354,48 +389,70 @@ Each environment in \`envs/{dev,stg,prd}\` pins package versions:
 - **Named exports** - Prefer named exports over default
 - **Single responsibility** - Each module has one clear purpose
 
-## Feature Taxonomy Quick Reference
+## Behavior Management Quick Reference
 
 ### Structure
 \`\`\`
 <DOMAIN>.<ENTITY>.<OPERATION>[.<QUALIFIER>]*
 
-Examples: TASK.ITEM.CREATE, TEAM.MEMBER.INVITE, USER.PROFILE.UPDATE
+Examples: USER.ROUTE.CREATE, API.AUTH.MIDDLEWARE, DB.SCHEMA.USERS
 \`\`\`
 
 ### Standard Domains
-**AUTH** | **USER** | **TEAM** | **PROJECT** | **TASK** | **API** | **DB** | **UI** | **AGENT** | **INFRA**
+**API** | **WEB** | **DB** | **UI** | **SHARED** | **AGENT** | **INFRA** | **TEST** | **BUILD**
 
 ### Standard Operations
-**CREATE** | **READ** | **LIST** | **UPDATE** | **DELETE** | **VALIDATE** | **SEARCH** | **EXPORT** | **IMPORT** | **SYNC**
+**CREATE** | **READ** | **UPDATE** | **DELETE** | **LIST** | **IMPLEMENT** | **TEST** | **VALIDATE** | **COMPILE** | **DEPLOY**
 
-### Feature Header Template
+### @behavior Header Template (TEST FILES ONLY)
 \`\`\`typescript
 /**
- * @feature DOMAIN.ENTITY.OPERATION
- * @domain DOMAIN
- * @entity ENTITY
- * @operation OPERATION
- * @layer API|DB|UI|AGENT
- * @dependencies [FEATURE_ID, FEATURE_ID]
- * @implements
- *   - Implementation detail 1
- *   - Implementation detail 2
- * @tests
- *   - Test description 1
- *   - Test description 2
+ * @behavior DOMAIN.ENTITY.OPERATION
+ * @priority CRITICAL|HIGH|MEDIUM|LOW
+ * @effort TRIVIAL|SMALL|MEDIUM|LARGE|XLARGE
+ * @theme SPEED|QUALITY|SCALE|EXPERIENCE
+ * @persona ARCHITECT|DEVELOPER|OPERATOR|USER
+ * @layer API|DB|UI|AGENT|INFRA
+ * @dependencies [BEHAVIOR_ID, BEHAVIOR_ID]
+ *
+ * @why
+ * Business context and value explanation
+ *
+ * @who
+ * As X, I want Y, so that Z
+ *
+ * @what
+ * Given: Context
+ * When: Action
+ * Then: Expected outcome
+ *
+ * @acceptance
+ * - [ ] Criterion 1
+ * - [ ] Criterion 2
  */
-export function featureName() { ... }
+
+import { describe, test, expect } from 'vitest';
+
+describe('DOMAIN.ENTITY.OPERATION', () => {
+  describe('Given: Context', () => {
+    test('When: Action, Then: Outcome', () => {
+      // TDD: Start with failing test
+      expect(true).toBe(false);
+    });
+  });
+});
 \`\`\`
 
 ### Commands
 \`\`\`bash
-yarn feature:validate           # Check taxonomy, dependencies, circular deps
-yarn feature:sync               # Generate features.json from @feature headers
-yarn feature:search TASK.*      # Find features by pattern
+yarn behaviors:sync             # Scan test files → generate behaviors.json
+yarn behaviors:validate         # Validate behaviors against taxonomy
+yarn behaviors:summary          # Generate all dashboards
+yarn behaviors:search API.*     # Find behaviors by pattern
+yarn vh:summary                 # Generate Value Hypothesis dashboard
 \`\`\`
 
-**Full documentation**: [docs/FEATURE-TAXONOMY.md](docs/FEATURE-TAXONOMY.md)
+**Full documentation**: [.flow/README.md](.flow/README.md) | [.flow/behavior-management.md](.flow/behavior-management.md)
 
 ## Agent Workflow Example
 
@@ -403,26 +460,54 @@ yarn feature:search TASK.*      # Find features by pattern
 User: "Add a new 'projects' feature with API and UI"
 
 Claude:
-1. ✅ Discusses schema design and proposes feature IDs:
-   - DB.SCHEMA.PROJECTS, PROJECT.ITEM.CREATE, PROJECT.ITEM.LIST
-   - UI.PROJECT.ITEM.CREATE.FORM, UI.PROJECT.ITEM.LIST.TABLE
-2. ✅ Agrees on architecture and dependencies
-3. ✅ Implements with @feature headers:
-   - packages/db/src/schema/projects.ts (DB.SCHEMA.PROJECTS)
-   - apps/api/src/routes/projects.ts (PROJECT.ITEM.CREATE, PROJECT.ITEM.LIST)
-   - apps/web/src/pages/ProjectsPage.tsx (UI components)
-   - Co-located tests for all layers
-4. ✅ Validates:
-   - yarn feature:validate (taxonomy check)
-   - yarn feature:sync (generate registry)
+1. ✅ Creates Value Hypothesis in .flow/value-hypotheses.json:
+   - PROJECT.CRUD.VALIDATE (impact: 0.8, confidence: 0.85, effort: 0.4)
+   - Links to behaviors: PROJECT.ROUTE.CREATE, PROJECT.ROUTE.LIST, UI.PROJECT.PAGE
+
+2. ✅ Discusses schema design and proposes behavior IDs:
+   - DB.SCHEMA.PROJECTS, PROJECT.ROUTE.CREATE, PROJECT.ROUTE.LIST
+   - UI.PROJECT.PAGE, UI.PROJECT.FORM, UI.PROJECT.LIST
+
+3. ✅ Agrees on architecture and dependencies
+
+4. ✅ Implements with TDD workflow:
+   - Writes TEST file: packages/db/src/schema/projects.test.ts
+     * Adds @behavior DB.SCHEMA.PROJECTS header
+     * Writes failing tests (Given-When-Then)
+   - Implements: packages/db/src/schema/projects.ts
+   - Makes tests pass
+
+   - Writes TEST file: apps/api/src/routes/projects.test.ts
+     * Adds @behavior PROJECT.ROUTE.CREATE header
+     * Adds @dependencies [DB.SCHEMA.PROJECTS]
+     * Writes failing tests
+   - Implements: apps/api/src/routes/projects.ts
+   - Makes tests pass
+
+   - Writes TEST file: apps/web/src/pages/ProjectsPage.test.tsx
+     * Adds @behavior UI.PROJECT.PAGE header
+     * Writes failing tests
+   - Implements: apps/web/src/pages/ProjectsPage.tsx
+   - Makes tests pass
+
+5. ✅ Validates and documents:
+   - yarn behaviors:sync (generates behaviors.json from test files)
+   - yarn behaviors:validate (taxonomy check)
    - yarn build (all packages compile)
    - yarn lint:check (0 warnings)
    - yarn test (all tests pass)
-5. ✅ Delivers 100% clean code with feature documentation
+   - yarn behaviors:summary (generates roadmap, backlog, etc.)
+   - yarn vh:summary (updates VH dashboard)
 
-User: Reviews features.json, runs database migration, deploys to dev
+6. ✅ Delivers 100% clean code with behavior documentation:
+   - 3 behaviors tracked (all DONE)
+   - 1 VH incomplete (awaiting outcome measurement)
+   - Dashboards show implementation progress
+   - Roadmap updated with dependencies
+
+User: Reviews .flow/vh-dashboard.md, runs database migration, deploys to dev
 \`\`\`
 
 ---
 
-**Remember**: We deliver 100% clean code with full feature documentation. Every implementation gets an @feature header. No shortcuts, no "TODO" comments, no skipped tests. Turborepo + Biome + Vitest + Feature Taxonomy = Fast, reliable, maintainable builds every time.
+**Remember**: We deliver 100% clean code with full behavior documentation through TDD. Every behavior gets an @behavior header in its TEST file. No shortcuts, no "TODO" comments, no skipped tests. Tests define behaviors, status computed from test results. Turborepo + Biome + Vitest + Behavior Management = Fast, reliable, maintainable builds every time.
