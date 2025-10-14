@@ -43,3 +43,11 @@ lerna-debug.log*
 
 # OS
 Thumbs.db
+
+# Auto-generated behavior management files
+behaviors.json
+.flow/behaviors.md
+.flow/roadmap.md
+.flow/progress.md
+.flow/backlog.md
+.flow/vh-dashboard.md
