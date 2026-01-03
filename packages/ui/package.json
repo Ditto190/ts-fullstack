@@ -19,6 +19,10 @@
     "build": "tsc --noEmit"
   },
   "dependencies": {
+    "@adobe/react-spectrum": "^3.46.0",
+    "@react-aria/utils": "^3.32.0",
+    "@react-spectrum/provider": "^3.10.12",
+    "@react-spectrum/theme-default": "^3.5.22",
     "clsx": "^2.1.1",
     "tailwind-merge": "^2.6.0"
   },
