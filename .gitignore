@@ -52,3 +52,15 @@ behaviors.json
 .flow/progress.md
 .flow/backlog.md
 .flow/vh-dashboard.md
+
+# Git worktrees
+worktrees/
+
+# Python virtual environments
+packages/python-agent/.venv/
+packages/python-agent/__pycache__/
+*.pyc
+
+# ChromaDB persistence
+chroma_data/
+*.sqlite3
