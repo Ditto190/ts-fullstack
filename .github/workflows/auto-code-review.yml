@@ -1,0 +1,136 @@
+name: Automated Code Review
+
+# Trigger on pull request opened (not on every commit to reduce API usage)
+on:
+  pull_request:
+    types: [opened]
+
+# Least-privilege permissions
+permissions:
+  contents: read        # Read repository code
+  pull-requests: write  # Post comments on PRs
+  id-token: write       # Required for OIDC token (Claude Code authentication)
+
+jobs:
+  code-review:
+    name: Claude Code Review
+    runs-on: ubuntu-latest
+    timeout-minutes: 10  # Prevent stuck jobs
+
+    steps:
+      # Step 1: Checkout PR merge commit (includes all changes)
+      - name: Checkout PR code
+        uses: actions/checkout@v4
+        with:
+          # Checkout the merge commit to review the full PR diff
+          ref: refs/pull/${{ github.event.pull_request.number }}/merge
+          # Fetch full history for better context
+          fetch-depth: 0
+
+      # Step 2: Post initial status comment
+      - name: Post initial status
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '🤖 **Code review in progress...**\n\nClaude Code is analyzing your changes. This usually takes less than 2 minutes.\n\n_Analyzing ${{ github.event.pull_request.changed_files }} changed files..._'
+            })
+
+      # Step 3: Run Claude Code review
+      - name: Run Claude Code review
+        id: claude_review
+        uses: anthropics/claude-code-action@v1
+        with:
+          # OAuth token from repository secrets (uses Claude Max subscription)
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          # Review mode for code analysis
+          mode: 'review'
+          # PR number for context
+          pr_number: ${{ github.event.pull_request.number }}
+          # Custom review guidelines (optional)
+          guidelines_path: '.github/CLAUDE.md'
+          # Focus areas for review
+          focus_areas: |
+            - Security vulnerabilities
+            - Potential bugs
+            - Code quality issues
+            - Performance concerns
+        # Continue even if review fails (to post error message)
+        continue-on-error: true
+
+      # Step 4: Handle errors and usage limits
+      - name: Handle review errors
+        if: steps.claude_review.outcome == 'failure'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let errorMessage = '⚠️ **Code review encountered an issue**\n\n';
+
+            // Check for common error types
+            const errorOutput = '${{ steps.claude_review.outputs.error }}';
+
+            if (errorOutput.includes('usage limit') || errorOutput.includes('rate limit')) {
+              errorMessage += '**Issue**: Claude Max usage limit reached.\n\n';
+              errorMessage += '**Next steps**:\n';
+              errorMessage += '- Review will automatically retry when quota resets\n';
+              errorMessage += '- Alternatively, proceed with manual code review\n';
+              errorMessage += '- Check your Claude Max subscription usage at claude.ai\n';
+            } else if (errorOutput.includes('authentication') || errorOutput.includes('token')) {
+              errorMessage += '**Issue**: Authentication failed.\n\n';
+              errorMessage += '**Next steps**:\n';
+              errorMessage += '1. Verify `CLAUDE_CODE_OAUTH_TOKEN` secret is set correctly\n';
+              errorMessage += '2. Regenerate token using `/install-github-app` in Claude CLI\n';
+              errorMessage += '3. Ensure Claude Max subscription is active\n';
+            } else if (errorOutput.includes('timeout')) {
+              errorMessage += '**Issue**: Review timed out (PR may be too large).\n\n';
+              errorMessage += '**Next steps**:\n';
+              errorMessage += '- Consider breaking this PR into smaller chunks\n';
+              errorMessage += '- Request manual review from team\n';
+            } else {
+              errorMessage += '**Issue**: Unexpected error occurred.\n\n';
+              errorMessage += '**Next steps**:\n';
+              errorMessage += '- Check workflow logs for details\n';
+              errorMessage += '- Retry by closing and reopening the PR\n';
+              errorMessage += '- Contact repository maintainers if issue persists\n';
+            }
+
+            errorMessage += '\n**Workflow run**: ' + context.payload.repository.html_url + '/actions/runs/' + context.runId;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: errorMessage
+            });
+
+      # Step 5: Post review completion summary
+      - name: Post review summary
+        if: steps.claude_review.outcome == 'success'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const summary = `✅ Code review complete\n\nAnalysis summary:\n- ${{ github.event.pull_request.changed_files }} files reviewed\n- ${{ github.event.pull_request.additions }} lines added\n- ${{ github.event.pull_request.deletions }} lines removed\n\nSee inline comments for detailed feedback.\n\nNext steps:\n- Address any critical or warning issues\n- Use @claude apply to auto-fix suggested improvements\n- Request human review when ready\n\nReview completed in ${{ steps.claude_review.outputs.duration || 'N/A' }}`;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: summary
+            });
+
+      # Step 6: Skip review for large PRs
+      - name: Check PR size
+        if: github.event.pull_request.changed_files > 500
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '⚠️ **Large PR detected**\n\nThis PR modifies ${{ github.event.pull_request.changed_files }} files, which exceeds the recommended limit of 500 files.\n\n**Recommendation**: Consider breaking this into smaller PRs for better review quality and faster feedback.\n\nAutomated review skipped for this PR size.'
+            });
+            // Exit early for large PRs
+            core.setFailed('PR too large for automated review');
