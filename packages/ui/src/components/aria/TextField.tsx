@@ -3,8 +3,8 @@
  * Text input with built-in validation, labels, and help text
  */
 
-import React from 'react';
-import { TextField as SpectrumTextField, TextFieldProps as SpectrumTextFieldProps } from '@adobe/react-spectrum';
+import { TextField as SpectrumTextField } from '@adobe/react-spectrum';
+import type { SpectrumTextFieldProps } from '@react-types/textfield';
 
 export type TextFieldProps = SpectrumTextFieldProps;
 

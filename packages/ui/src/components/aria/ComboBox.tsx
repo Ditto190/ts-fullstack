@@ -3,8 +3,8 @@
  * Autocomplete dropdown with keyboard navigation and filtering
  */
 
-import React from 'react';
-import { ComboBox as SpectrumComboBox, ComboBoxProps as SpectrumComboBoxProps, Item } from '@adobe/react-spectrum';
+import { ComboBox as SpectrumComboBox, Item } from '@adobe/react-spectrum';
+import type { SpectrumComboBoxProps } from '@react-types/combobox';
 
 export type ComboBoxProps<T> = SpectrumComboBoxProps<T>;
 

@@ -5,14 +5,14 @@
  * @module @adaptiveworx/ui/aria
  */
 
-export { ThemeProvider } from './ThemeProvider';
-export type { ThemeProviderProps } from './ThemeProvider';
+export { ThemeProvider } from './ThemeProvider.js';
+export type { ThemeProviderProps } from './ThemeProvider.js';
 
-export { Button } from './Button';
-export type { ButtonProps } from './Button';
+export { Button } from './Button.js';
+export type { ButtonProps } from './Button.js';
 
-export { TextField } from './TextField';
-export type { TextFieldProps } from './TextField';
+export { TextField } from './TextField.js';
+export type { TextFieldProps } from './TextField.js';
 
-export { ComboBox, Item } from './ComboBox';
-export type { ComboBoxProps } from './ComboBox';
+export { ComboBox, Item } from './ComboBox.js';
+export type { ComboBoxProps } from './ComboBox.js';

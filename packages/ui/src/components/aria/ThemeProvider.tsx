@@ -8,7 +8,7 @@ import { Provider, defaultTheme } from '@adobe/react-spectrum';
 
 export interface ThemeProviderProps {
   children: React.ReactNode;
-  colorScheme?: 'light' | 'dark' | 'auto';
+  colorScheme?: 'light' | 'dark';
   scale?: 'medium' | 'large';
 }
 

@@ -3,8 +3,8 @@
  * Wrapper around React Spectrum Button with consistent styling
  */
 
-import React from 'react';
-import { Button as SpectrumButton, ButtonProps as SpectrumButtonProps } from '@adobe/react-spectrum';
+import { Button as SpectrumButton } from '@adobe/react-spectrum';
+import type { SpectrumButtonProps } from '@react-types/button';
 
 export type ButtonProps = SpectrumButtonProps;
 
